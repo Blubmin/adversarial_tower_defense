@@ -17,6 +17,12 @@ class Board:
     def addUnit(self, unit):
         self._units.append(unit)
 
+    def step(self):
+        for unit in self._units:
+            if unit._y > self._height:
+                unit.setIsAtGoal()
+                self._units.remove(unit)
+
     def draw(self, screen):
         line_color = (125, 125, 125)
         for x in range(self._offset_x, self._offset_x + self._width * self._grid_size + 1, self._grid_size):

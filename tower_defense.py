@@ -32,6 +32,7 @@ class App:
     def on_loop(self):
         for agent in self._agents:
             agent.step(self._board)
+        self._board.step()
 
     def on_render(self):
         self._screen.fill((0, 0, 0))
