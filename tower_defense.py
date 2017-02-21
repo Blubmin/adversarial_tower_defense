@@ -1,8 +1,9 @@
 import pygame
 from pygame.locals import *
 
-from tower import Tower
 from board import Board
+from unit_agent import UnitAgent
+from tower_agent import TowerAgent
 
 
 class App:
@@ -10,23 +11,38 @@ class App:
         self._running = True
         self._image_surf = None
         self._board = None
+        self._agents = [TowerAgent(), UnitAgent()]
+
 
     def on_init(self):
         pygame.init()
-        self._display_surf = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
+        self._screen = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
         self._running = True
         self._board = Board(0, 64)
-        self._board.add_tower(Tower(), 1, 1)
+
+        for agent in self._agents:
+            agent.init(self._board)
+
 
     def on_event(self, event):
         if event.type == QUIT:
             self._running = False
+        # Quit game on pressing ESC
+        if event.type == pygame.KEYDOWN:
+            if event.key == K_ESCAPE:
+                self._running = False
 
     def on_loop(self):
-        pass
+        for agent in self._agents:
+            agent.step(self._board)
+        self._board.step()
 
     def on_render(self):
-        self._board.draw(self._display_surf)
+        self._screen.fill((0, 0, 0))
+        
+        self._board.draw(self._screen)
+        for agent in self._agents:
+            agent.render()
 
         pygame.display.flip()
 
