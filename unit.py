@@ -5,6 +5,7 @@ class Unit:
         self._image = pygame.image.load("unit.png").convert_alpha()
         self._x = x
         self._y = y
+        self._health = 100
         self._shouldDestroy = False
         self._isAtGoal = False
 
@@ -13,3 +14,8 @@ class Unit:
 
     def setIsAtGoal(self):
         self._isAtGoal = True
+
+    def damage(self, damage):
+        self._health -= damage
+        if self._health <= 0:
+            self._shouldDestroy = True

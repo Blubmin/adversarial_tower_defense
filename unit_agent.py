@@ -18,7 +18,7 @@ class UnitAgent:
             elif unit._isAtGoal:
                 self._units.remove(unit)
             else:
-                unit._y += 0.1
+                unit._y += 0.05
 
     def render(self):
         pass

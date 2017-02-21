@@ -28,7 +28,7 @@ class Board:
             if unit._shouldDestroy:
                 self._units.remove(unit)
 
-            if unit._y > self._height:
+            elif unit._y > self._height:
                 unit.setIsAtGoal()
                 self._units.remove(unit)
 
@@ -36,17 +36,21 @@ class Board:
         for bullet in self._bullets:
             bullet.step()
 
-            # Check for out of bounds
-            if bullet._x > self._width or bullet._x < 0 or bullet._y > self._height or bullet._y < 0:
-                bullet.setShouldDestroy()
+            if bullet._shouldDestroy:
                 self._bullets.remove(bullet)
 
-            # Check for collisions
-            for unit in self._units:
-                if self.hasCollision(bullet, unit):
-                    unit.setShouldDestroy()
+            else:
+                # Check for out of bounds
+                if bullet._x > self._width or bullet._x < 0 or bullet._y > self._height or bullet._y < 0:
                     bullet.setShouldDestroy()
                     self._bullets.remove(bullet)
+
+                # Check for collisions
+                for unit in self._units:
+                    if self.hasCollision(bullet, unit):
+                        unit.damage(50)
+                        bullet.setShouldDestroy()
+                        self._bullets.remove(bullet)
 
 
     def distance(self, obj1, obj2):
