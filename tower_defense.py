@@ -36,8 +36,8 @@ class App:
 
     def on_render(self):
         self._screen.fill((0, 0, 0))
+        
         self._board.draw(self._screen)
-
         for agent in self._agents:
             agent.render()
 
