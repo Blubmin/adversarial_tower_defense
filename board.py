@@ -10,7 +10,7 @@ class Board:
         self._height = 10
         self._towers = [[None for x in range(self._height)] for x in range(self._width)]
 
-    def addTower(self, tower, x, y):
+    def add_tower(self, tower, x, y):
         self._towers[x][y] = tower
 
     def draw(self, display_surf):

@@ -16,7 +16,7 @@ class App:
         self._display_surf = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
         self._running = True
         self._board = Board(0, 64)
-        self._board.addTower(Tower(), 1, 1)
+        self._board.add_tower(Tower(), 1, 1)
 
     def on_event(self, event):
         if event.type == QUIT:
