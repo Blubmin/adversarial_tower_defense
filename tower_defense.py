@@ -34,6 +34,7 @@ class App:
             agent.step(self._board)
 
     def on_render(self):
+        self._display_surf.fill((0, 0, 0))
         self._board.draw(self._display_surf)
 
         for agent in self._agents:

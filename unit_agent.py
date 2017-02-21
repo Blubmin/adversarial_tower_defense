@@ -3,9 +3,14 @@ import pygame
 from unit import Unit
 
 class UnitAgent:
+   def __init__(self):
+      self._units = []
    def init(self, board):
-      board.addUnit(Unit(3, 4))
+      unit = Unit(3, -2)
+      self._units.append(unit)
+      board.addUnit(unit)
    def step(self, board):
-      pass
+      for unit in self._units:
+         unit._y += 0.1
    def render(self):
       pass
