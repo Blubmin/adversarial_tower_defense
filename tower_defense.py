@@ -21,6 +21,10 @@ class App:
     def on_event(self, event):
         if event.type == QUIT:
             self._running = False
+        # Quit game on pressing ESC
+        if event.type == pygame.KEYDOWN:
+            if event.key == K_ESCAPE:
+                self._running = False
 
     def on_loop(self):
         pass
