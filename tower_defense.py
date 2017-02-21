@@ -1,8 +1,9 @@
 import pygame
 from pygame.locals import *
 
-from tower import Tower
 from board import Board
+from unit_agent import UnitAgent
+from tower_agent import TowerAgent
 
 
 class App:
@@ -10,13 +11,15 @@ class App:
         self._running = True
         self._image_surf = None
         self._board = None
+        self._agents = [TowerAgent(), UnitAgent()]
 
     def on_init(self):
         pygame.init()
         self._display_surf = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
         self._running = True
         self._board = Board(0, 64)
-        self._board.addTower(Tower(), 1, 1)
+        for agent in self._agents:
+            agent.init(self._board)
 
     def on_event(self, event):
         if event.type == QUIT:
@@ -27,10 +30,14 @@ class App:
                 self._running = False
 
     def on_loop(self):
-        pass
+        for agent in self._agents:
+            agent.step(self._board)
 
     def on_render(self):
         self._board.draw(self._display_surf)
+
+        for agent in self._agents:
+            agent.render()
 
         pygame.display.flip()
 

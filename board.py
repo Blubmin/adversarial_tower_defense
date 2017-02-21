@@ -9,9 +9,13 @@ class Board:
         self._width = 10
         self._height = 10
         self._towers = [[None for x in range(self._height)] for x in range(self._width)]
+        self._units = []
 
-    def addTower(self, tower, x, y):
-        self._towers[x][y] = tower
+    def addTower(self, tower):
+        self._towers[tower._x][tower._y] = tower
+
+    def addUnit(self, unit):
+        self._units.append(unit)
 
     def draw(self, display_surf):
         line_color = (125, 125, 125)
@@ -29,3 +33,6 @@ class Board:
                     continue
                 display_surf.blit(self._towers[i][j]._image,
                                   (i * self._grid_size + self._offset_x, j * self._grid_size + self._offset_y))
+
+        for unit in self._units:
+            display_surf.blit(unit._image, (unit._x * self._grid_size + self._offset_x, unit._y * self._grid_size + self._offset_y))
