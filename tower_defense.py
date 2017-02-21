@@ -15,7 +15,7 @@ class App:
 
     def on_init(self):
         pygame.init()
-        self._display_surf = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
+        self._screen = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
         self._running = True
         self._board = Board(0, 64)
         for agent in self._agents:
@@ -34,8 +34,8 @@ class App:
             agent.step(self._board)
 
     def on_render(self):
-        self._display_surf.fill((0, 0, 0))
-        self._board.draw(self._display_surf)
+        self._screen.fill((0, 0, 0))
+        self._board.draw(self._screen)
 
         for agent in self._agents:
             agent.render()

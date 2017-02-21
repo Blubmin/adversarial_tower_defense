@@ -17,22 +17,22 @@ class Board:
     def addUnit(self, unit):
         self._units.append(unit)
 
-    def draw(self, display_surf):
+    def draw(self, screen):
         line_color = (125, 125, 125)
         for x in range(self._offset_x, self._offset_x + self._width * self._grid_size + 1, self._grid_size):
-            pygame.draw.line(display_surf, line_color, (x, self._offset_y),
+            pygame.draw.line(screen, line_color, (x, self._offset_y),
                              (x, self._offset_y + self._height * self._grid_size))
 
         for y in range(self._offset_y, self._offset_y + self._height * self._grid_size + 1, self._grid_size):
-            pygame.draw.line(display_surf, line_color, (self._offset_x, y),
+            pygame.draw.line(screen, line_color, (self._offset_x, y),
                              (self._offset_x + self._width * self._grid_size, y))
 
         for i in range(self._width):
             for j in range(self._height):
                 if (self._towers[i][j] is None):
                     continue
-                display_surf.blit(self._towers[i][j]._image,
+                screen.blit(self._towers[i][j]._image,
                                   (i * self._grid_size + self._offset_x, j * self._grid_size + self._offset_y))
 
         for unit in self._units:
-            display_surf.blit(unit._image, (unit._x * self._grid_size + self._offset_x, unit._y * self._grid_size + self._offset_y))
+            screen.blit(unit._image, (unit._x * self._grid_size + self._offset_x, unit._y * self._grid_size + self._offset_y))
