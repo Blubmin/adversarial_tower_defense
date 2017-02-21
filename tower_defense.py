@@ -1,7 +1,5 @@
 import pygame
 from pygame.locals import *
- 
-theApp = None
 
 class Tower:
     def __init__(self):
@@ -19,19 +17,19 @@ class Board:
     def addTower(self, tower, x, y):
         self._towers[x][y] = tower
 
-    def draw(self):
+    def draw(self, display_surf):
         line_color = (125, 125, 125)
         for x in range(self._offset_x, self._offset_x + self._width * self._grid_size + 1, self._grid_size):
-            pygame.draw.line(theApp._display_surf, line_color, (x, self._offset_y), (x, self._offset_y + self._height * self._grid_size))
+            pygame.draw.line(display_surf, line_color, (x, self._offset_y), (x, self._offset_y + self._height * self._grid_size))
 
         for y in range(self._offset_y, self._offset_y + self._height * self._grid_size + 1, self._grid_size):
-            pygame.draw.line(theApp._display_surf, line_color, (self._offset_x, y), (self._offset_x + self._width * self._grid_size, y))
+            pygame.draw.line(display_surf, line_color, (self._offset_x, y), (self._offset_x + self._width * self._grid_size, y))
 
         for i in range(self._width):
             for j in range(self._height):
                 if (self._towers[i][j] is None):
                     continue
-                theApp._display_surf.blit(self._towers[i][j]._image, (i * self._grid_size + self._offset_x, j * self._grid_size + self._offset_y))
+                display_surf.blit(self._towers[i][j]._image, (i * self._grid_size + self._offset_x, j * self._grid_size + self._offset_y))
 
 class App:
     def __init__(self):
@@ -52,7 +50,7 @@ class App:
     def on_loop(self):
         pass
     def on_render(self):
-        self._board.draw()
+        self._board.draw(self._display_surf)
 
         pygame.display.flip()
  
