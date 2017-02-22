@@ -3,6 +3,7 @@ from pygame.locals import *
 
 from board import Board
 from unit_agent import UnitAgent
+from tower import Tower
 from tower_agent import TowerAgent
 
 
@@ -31,6 +32,15 @@ class App:
         if event.type == pygame.KEYDOWN:
             if event.key == K_ESCAPE:
                 self._running = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1: # Left mouse button
+                x, y = pygame.mouse.get_pos()
+                if not self._board.contains_point(x, y):
+                    return
+                grid_x, grid_y = self._board.screen_to_grid(x, y)
+                tower = Tower(grid_x, grid_y)
+                self._board.add_tower(tower)
 
     def on_loop(self):
         for agent in self._agents:

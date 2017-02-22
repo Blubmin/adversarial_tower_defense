@@ -12,10 +12,7 @@ class TowerAgent:
         board.add_tower(tower)
 
     def step(self, board):
-        for tower in self._towers:
-            for unit in board._units:
-                if board.distance(tower, unit) < 5:
-                    tower.shoot(board, unit)
+        return
 
     def render(self):
         pass

@@ -53,6 +53,13 @@ class Board:
                         bullet.setShouldDestroy()
                         self._bullets.remove(bullet)
 
+        # Updates towers
+        for i in range(self._width):
+            for j in range(self._height):
+                if (self._towers[i][j] is None):
+                    continue
+                self._towers[i][j].step(self)
+
     def distance(self, obj1, obj2):
         return math.sqrt(pow(obj1._x - obj2._x, 2) + pow(obj1._y - obj2._y, 2))
 
@@ -75,8 +82,7 @@ class Board:
         if self.contains_point(mouse_x, mouse_y):
             s = Tower._image.copy()
             s.set_alpha(.5)
-            screen.blit(s, (((int) (mouse_x / self._cell_size)) * self._cell_size,
-                        ((int) (mouse_y / self._cell_size)) * self._cell_size))
+            screen.blit(s, self.trunc_screen(mouse_x, mouse_y))
 
         # Draws towers
         for i in range(self._width):
@@ -95,6 +101,13 @@ class Board:
 
     def grid_to_screen(self, x, y):
         return (x * self._cell_size + self._offset_x, y * self._cell_size + self._offset_y)
+
+    def trunc_screen(self, x, y):
+        return (((int) (x / self._cell_size)) * self._cell_size,
+                ((int) (y / self._cell_size)) * self._cell_size)
+
+    def screen_to_grid(self, x, y):
+        return ((int) ((x - self._offset_x) / self._cell_size), (int) ((y - self._offset_y) / self._cell_size))
 
     def contains_point(self, x, y):
         return (self._offset_x <= x < self._offset_x + self._width * self._cell_size

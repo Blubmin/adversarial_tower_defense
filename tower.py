@@ -12,6 +12,11 @@ class Tower:
         self._shootingDelay = 1000
         self._timeOfLastShot = 0
 
+    def step(self, board):
+        for unit in board._units:
+            if board.distance(self, unit) < 5:
+                self.shoot(board, unit)
+
     def shoot(self, board, target):
         if pygame.time.get_ticks() - self._timeOfLastShot > self._shootingDelay:
             dist = board.distance(self, target)
