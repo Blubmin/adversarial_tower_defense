@@ -60,6 +60,7 @@ class Board:
         return self.distance(obj1, obj2) < 0.5
 
     def draw(self, screen):
+        # Draws grid
         line_color = (125, 125, 125)
         for x in range(self._offset_x, self._offset_x + self._width * self._cell_size + 1, self._cell_size):
             pygame.draw.line(screen, line_color, (x, self._offset_y),
@@ -69,6 +70,7 @@ class Board:
             pygame.draw.line(screen, line_color, (self._offset_x, y),
                              (self._offset_x + self._width * self._cell_size, y))
 
+        # Draws mouse tower
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if self.contains_point(mouse_x, mouse_y):
             s = Tower._image.copy()
@@ -76,20 +78,23 @@ class Board:
             screen.blit(s, (((int) (mouse_x / self._cell_size)) * self._cell_size,
                         ((int) (mouse_y / self._cell_size)) * self._cell_size))
 
+        # Draws towers
         for i in range(self._width):
             for j in range(self._height):
                 if (self._towers[i][j] is None):
                     continue
-                screen.blit(self._towers[i][j]._image,
-                            (i * self._cell_size + self._offset_x, j * self._cell_size + self._offset_y))
+                screen.blit(self._towers[i][j]._image, self.grid_to_screen(i, j))
 
+        # Draws enemy units
         for unit in self._units:
-            screen.blit(unit._image,
-                        (unit._x * self._cell_size + self._offset_x, unit._y * self._cell_size + self._offset_y))
+            screen.blit(unit._image, self.grid_to_screen(unit._x, unit._y))
 
+        # Draws tower bullets
         for bullet in self._bullets:
-            screen.blit(bullet._image,
-                        (bullet._x * self._cell_size + self._offset_x, bullet._y * self._cell_size + self._offset_y))
+            screen.blit(bullet._image, self.grid_to_screen(bullet._x, bullet._y))
+
+    def grid_to_screen(self, x, y):
+        return (x * self._cell_size + self._offset_x, y * self._cell_size + self._offset_y)
 
     def contains_point(self, x, y):
         return (self._offset_x <= x < self._offset_x + self._width * self._cell_size
