@@ -1,6 +1,7 @@
 import pygame
 import math
 
+from tower import Tower
 
 class Board:
     def __init__(self, offset_x, offset_y):
@@ -13,15 +14,13 @@ class Board:
         self._units = []
         self._bullets = []
 
-
-    def addTower(self, tower):
+    def add_tower(self, tower):
         self._towers[tower._x][tower._y] = tower
 
-
-    def addUnit(self, unit):
+    def add_unit(self, unit):
         self._units.append(unit)
 
-    def addBullet(self, bullet):
+    def add_bullet(self, bullet):
         self._bullets.append(bullet)
 
     def step(self):
@@ -49,16 +48,15 @@ class Board:
 
                 # Check for collisions
                 for unit in self._units:
-                    if self.hasCollision(bullet, unit):
+                    if self.has_collision(bullet, unit):
                         unit.damage(50)
                         bullet.setShouldDestroy()
                         self._bullets.remove(bullet)
 
-
     def distance(self, obj1, obj2):
         return math.sqrt(pow(obj1._x - obj2._x, 2) + pow(obj1._y - obj2._y, 2))
 
-    def hasCollision(self, obj1, obj2):
+    def has_collision(self, obj1, obj2):
         return self.distance(obj1, obj2) < 0.5
 
     def draw(self, screen):
@@ -71,15 +69,28 @@ class Board:
             pygame.draw.line(screen, line_color, (self._offset_x, y),
                              (self._offset_x + self._width * self._cell_size, y))
 
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if self.contains_point(mouse_x, mouse_y):
+            s = Tower._image.copy()
+            s.set_alpha(.5)
+            screen.blit(s, (((int) (mouse_x / self._cell_size)) * self._cell_size,
+                        ((int) (mouse_y / self._cell_size)) * self._cell_size))
+
         for i in range(self._width):
             for j in range(self._height):
                 if (self._towers[i][j] is None):
                     continue
                 screen.blit(self._towers[i][j]._image,
-                                  (i * self._cell_size + self._offset_x, j * self._cell_size + self._offset_y))
+                            (i * self._cell_size + self._offset_x, j * self._cell_size + self._offset_y))
 
         for unit in self._units:
-            screen.blit(unit._image, (unit._x * self._cell_size + self._offset_x, unit._y * self._cell_size + self._offset_y))
+            screen.blit(unit._image,
+                        (unit._x * self._cell_size + self._offset_x, unit._y * self._cell_size + self._offset_y))
 
         for bullet in self._bullets:
-            screen.blit(bullet._image, (bullet._x * self._cell_size + self._offset_x, bullet._y * self._cell_size + self._offset_y))
+            screen.blit(bullet._image,
+                        (bullet._x * self._cell_size + self._offset_x, bullet._y * self._cell_size + self._offset_y))
+
+    def contains_point(self, x, y):
+        return (self._offset_x <= x < self._offset_x + self._width * self._cell_size
+                and self._offset_y <= y < self._offset_y + self._height * self._cell_size)

@@ -9,7 +9,7 @@ class UnitAgent:
     def init(self, board):
         unit = Unit(3, -2)
         self._units.append(unit)
-        board.addUnit(unit)
+        board.add_unit(unit)
 
     def step(self, board):
         for unit in self._units:

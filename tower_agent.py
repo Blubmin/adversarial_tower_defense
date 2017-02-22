@@ -9,7 +9,7 @@ class TowerAgent:
     def init(self, board):
         tower = Tower(1, 8)
         self._towers.append(tower)
-        board.addTower(tower)
+        board.add_tower(tower)
 
     def step(self, board):
         for tower in self._towers:

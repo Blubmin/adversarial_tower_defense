@@ -4,8 +4,9 @@ from bullet import Bullet
 
 
 class Tower:
+
     def __init__(self, x, y):
-        self._image = pygame.image.load("tower.png").convert_alpha()
+        Tower._image = pygame.image.load("tower.png").convert_alpha()
         self._x = x
         self._y = y
         self._shootingDelay = 1000
@@ -16,5 +17,5 @@ class Tower:
             dist = board.distance(self, target)
             dx = (target._x - self._x) / dist / 3
             dy = (target._y - self._y) / dist / 3
-            board.addBullet(Bullet(self._x, self._y, dx, dy))
+            board.add_bullet(Bullet(self._x, self._y, dx, dy))
             self._timeOfLastShot = pygame.time.get_ticks()
