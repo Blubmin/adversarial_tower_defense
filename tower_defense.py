@@ -64,6 +64,7 @@ class App:
             self._running = False
 
         while (self._running):
+            start = pygame.time.get_ticks()
             for event in pygame.event.get():
                 self.on_event(event)
             self.on_loop()
