@@ -80,8 +80,7 @@ class Board:
         # Draws mouse tower
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if self.contains_point(mouse_x, mouse_y):
-            s = Tower._image.copy()
-            s.set_alpha(.5)
+            s = Tower._image_transparent.copy()
             screen.blit(s, self.trunc_screen(mouse_x, mouse_y))
 
         # Draws towers

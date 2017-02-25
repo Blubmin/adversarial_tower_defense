@@ -7,6 +7,7 @@ class Tower:
 
     def __init__(self, x, y):
         Tower._image = pygame.image.load("tower.png").convert_alpha()
+        Tower._image_transparent = pygame.image.load("tower_transparent.png").convert_alpha()
         self._x = x
         self._y = y
         self._shootingDelay = 1000
