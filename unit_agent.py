@@ -1,13 +1,15 @@
 import pygame
+import random
 
 from unit import Unit
 
 class UnitAgent:
     def __init__(self):
         self._units = []
+        self._maxUnits = 10
 
     def init(self, board):
-        unit = Unit(3, -2)
+        unit = Unit(random.randint(0, board._width - 1), -2)
         self._units.append(unit)
         board.add_unit(unit)
 
