@@ -53,8 +53,10 @@ class App:
         self._screen.fill((0, 0, 0))
         
         self._board.draw(self._screen)
+        xCoord = 10
         for agent in self._agents:
-            agent.render()
+            agent.render(self._screen, xCoord, 10)
+            xCoord += (self._board._width * self._board._cell_size) / len(self._agents)
 
         pygame.display.flip()
 

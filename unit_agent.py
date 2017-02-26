@@ -7,6 +7,7 @@ class UnitAgent:
     def __init__(self):
         self._units = []
         self._placementDelay = 0
+        self._score = 0
 
     def init(self, board):
         pass
@@ -18,6 +19,7 @@ class UnitAgent:
             if unit._shouldDestroy:
                 self._units.remove(unit)
             elif unit._isAtGoal:
+                self._score += 1
                 self._units.remove(unit)
             else:
                 unit._y += 0.05
@@ -29,5 +31,7 @@ class UnitAgent:
             self._units.append(unit)
             board.add_unit(unit)
 
-    def render(self):
-        pass
+    def render(self, screen, xCoord, yCoord):
+        myfont = pygame.font.SysFont("monospace", 15)
+        label = myfont.render("Unit Score: {0}".format(self._score), 1, (255,255,0))
+        screen.blit(label, (xCoord, yCoord))
