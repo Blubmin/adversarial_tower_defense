@@ -37,21 +37,20 @@ class Board:
         for bullet in self._bullets:
             bullet.step()
 
-            if bullet._shouldDestroy:
-                self._bullets.remove(bullet)
+            # Check for out of bounds
+            if bullet._x > self._width or bullet._x < 0 or bullet._y > self._height or bullet._y < 0:
+                bullet.setShouldDestroy()
 
             else:
-                # Check for out of bounds
-                if bullet._x > self._width or bullet._x < 0 or bullet._y > self._height or bullet._y < 0:
-                    bullet.setShouldDestroy()
-                    self._bullets.remove(bullet)
-
                 # Check for collisions
                 for unit in self._units:
                     if self.has_collision(bullet, unit):
                         unit.damage(50)
                         bullet.setShouldDestroy()
-                        self._bullets.remove(bullet)
+                        break
+
+            if bullet._shouldDestroy:
+                self._bullets.remove(bullet)
 
         # Updates towers
         for i in range(self._width):
