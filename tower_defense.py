@@ -32,6 +32,8 @@ class App:
         if event.type == pygame.KEYDOWN:
             if event.key == K_ESCAPE:
                 self._running = False
+            elif event.key == K_SPACE:
+                self.on_init()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left mouse button
