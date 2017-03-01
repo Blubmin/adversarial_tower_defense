@@ -5,7 +5,7 @@ class Unit:
         self._image = pygame.image.load("unit.png").convert_alpha()
         self._x = x
         self._y = y
-        self._health = 100
+        self._health = 150
         self._shouldDestroy = False
         self._isAtGoal = False
 
