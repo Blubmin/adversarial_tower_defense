@@ -39,6 +39,7 @@ class Board:
 
             if bullet._shouldDestroy:
                 self._bullets.remove(bullet)
+                continue
 
             # Check for out of bounds
             if bullet._x > self._width or bullet._x < 0 or bullet._y > self._height or bullet._y < 0:
