@@ -4,17 +4,19 @@ from random import randint
 from unit import Unit
 
 class UnitAgent:
-    def __init__(self):
+    def __init__(self, maxUnits):
         self._units = []
         self._placementDelay = 0
         self._score = 0
+        self._maxUnits = maxUnits
 
     def init(self, board):
-        pass
+        for i in range(0, self._maxUnits):
+            self.placeUnit(board)
 
     def step(self, board):
-        self._placementDelay -= 1
-        self.placeUnit(board)
+        # self._placementDelay -= 1
+        # self.placeUnit(board)
         for unit in self._units:
             if unit._shouldDestroy:
                 self._units.remove(unit)
@@ -25,8 +27,8 @@ class UnitAgent:
                 unit._y += 0.05
 
     def placeUnit(self, board):
-        if self._placementDelay <= 0:
-            self._placementDelay = randint(10, 100)
+        # if self._placementDelay <= 0:
+        #     self._placementDelay = randint(10, 100)
             unit = Unit(randint(0, board._width - 1), -2)
             self._units.append(unit)
             board.add_unit(unit)

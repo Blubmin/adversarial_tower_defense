@@ -12,7 +12,7 @@ class App:
         self._running = True
         self._image_surf = None
         self._board = None
-        self._agents = [TowerAgent(), UnitAgent()]
+        self._agents = [TowerAgent(10), UnitAgent(10)]
 
 
     def on_init(self):
