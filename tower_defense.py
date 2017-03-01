@@ -20,6 +20,7 @@ class App:
         self._screen = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
         self._running = True
         self._board = Board(0, 64)
+        self._steps = 0
 
         for agent in self._agents:
             agent.init(self._board)
@@ -71,8 +72,10 @@ class App:
             start = pygame.time.get_ticks()
             for event in pygame.event.get():
                 self.on_event(event)
-            self.on_loop()
-            self.on_render()
+            if self._steps < 1000:
+                self.on_loop()
+                self.on_render()
+                self._steps += 1
         self.on_cleanup()
 
 
