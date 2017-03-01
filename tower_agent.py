@@ -6,10 +6,11 @@ from tower import Tower
 class TowerAgent:
     def __init__(self, maxUnits):
         self._towers = []
-        self._score = 0
         self._maxUnits = maxUnits
 
     def init(self, board):
+        self._towers = []
+        self._score = 0
         for i in range(0, self._maxUnits):
             self.placeTower(board)
         # tower = Tower(1, 8)

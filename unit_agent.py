@@ -6,11 +6,12 @@ from unit import Unit
 class UnitAgent:
     def __init__(self, maxUnits):
         self._units = []
-        self._placementDelay = 0
-        self._score = 0
         self._maxUnits = maxUnits
 
     def init(self, board):
+        self._units = []
+        self._placementDelay = 0
+        self._score = 0
         for i in range(0, self._maxUnits):
             self.placeUnit(board)
 
