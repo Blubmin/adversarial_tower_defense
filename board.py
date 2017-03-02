@@ -14,6 +14,13 @@ class Board:
         self._units = []
         self._bullets = []
 
+    def hasTower(self, x, y):
+        if x < 0 or x >= self._width:
+            return False
+        if y < 0 or y >= self._width:
+            return False
+        return self._towers[x][y] != None
+
     def add_tower(self, tower):
         self._towers[tower._x][tower._y] = tower
 

@@ -1,5 +1,6 @@
 import pygame
 
+from math import sqrt
 from random import randint
 from unit import Unit
 
@@ -25,12 +26,15 @@ class UnitAgent:
                 self._score += 1
                 self._units.remove(unit)
             else:
-                unit._y += 0.05
+                unit.step(board)
+                # unit._y += 0.05
+        if self._units:
+            print()
 
     def placeUnit(self, board):
         # if self._placementDelay <= 0:
         #     self._placementDelay = randint(10, 100)
-            unit = Unit(randint(0, board._width - 1), -2)
+            unit = Unit(randint(0, board._width - 1), -1)
             self._units.append(unit)
             board.add_unit(unit)
 
@@ -38,3 +42,4 @@ class UnitAgent:
         myfont = pygame.font.SysFont("monospace", 15)
         label = myfont.render("Unit Score: {0}".format(self._score), 1, (255,255,0))
         screen.blit(label, (xCoord, yCoord))
+

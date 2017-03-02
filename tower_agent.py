@@ -13,9 +13,9 @@ class TowerAgent:
         self._score = 0
         for i in range(0, self._maxUnits):
             self.placeTower(board)
-        # tower = Tower(1, 8)
-        # self._towers.append(tower)
-        # board.add_tower(tower)
+            # tower = Tower(i, 8)
+            # self._towers.append(tower)
+            # board.add_tower(tower)
 
     def step(self, board):
         for unit in board._units:
