@@ -1,5 +1,6 @@
 
 from random import randint
+from board import BoardState
 
 def generateNewVector(vectors):
    newVector = []
@@ -73,32 +74,91 @@ class Agent:
 class NoAction:
    def __init__(self):
       self.name = "NoAction"
-
 class PlaceTowerAction:
    def __init__(self, x, y):
       self.name = "PlaceTowerAction"
       self.x = x
       self.y = y
-
 class PlaceUnitAction:
    def __init__(self, x):
       self.name = "PlaceUnitAction"
       self.x = x
 
-class State:
-   def __init__(self, action, score):
-      pass
 
-class StaticUnitAgent
-   def __init__(self, states):
-      self.states = states
-      self.nextState = 0
+class ActionState:
+   def __init__(self, boardState, action, score):
+      self.boardState = boardState
+      self.action = action
+      self.score = score
+
+
+class StaticUnitAgent:
+   def __init__(self, actionStates):
+      self._actionStates = actionStates
+      self._nextStateIndex = 0
 
    def step(self, state):
-      if state.step >= self.states[nextState]:
-         return self.states[nextState].action
+      # If there is still a state that needs to be executed
+      if self._nextStateIndex < len(self._actionStates):
+         nextState = self._actionStates[self._nextStateIndex]
+         # If the state should be executed
+         if state.stepCount >= self._actionStates[self._nextStateIndex].boardState.stepCount:
+            self._nextStateIndex += 1
+            # Execute the action associated with the state
+            return nextState.action
+      return NoAction()
 
+   def gameOver(self, score):
+      pass
 
+class TowerAgent:
+   def __init__(self):
+      self._actionStates = []
+
+   def step(self, state):
+      if len(self._actionStates) < 10:
+         if randint(0, 100) == 0:
+            action = PlaceTowerAction(randint(0, 9), randint(0, 9)) 
+            actionState = ActionState(state, action, None)
+            self._actionStates.append(actionState)
+            return action
+      return NoAction()
+
+   def gameOver(self, score):
+      for actionState in self._actionStates:
+         actionState.score = score
+      # TODO: store action states in database
+
+class Generator:
+   def __init__(self):
+      self._unitAgent = StaticUnitAgent([
+         ActionState(BoardState(10, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(50, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(100, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(150, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(200, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(250, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(300, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(350, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(400, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(450, 0, 0), PlaceUnitAction(randint(0, 9)), None)
+      ])
+
+   def init(self):
+      self._unitAgent._nextStateIndex = 0
+      self._towerAgent = TowerAgent()
+
+   def step(self, stepCount, board):
+      boardState = board.getState(stepCount)
+      boardState.stepCount = stepCount
+
+      board.execute(self._unitAgent.step(boardState))
+      board.execute(self._towerAgent.step(boardState))
+
+   def gameOver(self, board):
+      score = board.getScore()
+      self._unitAgent.gameOver(score)
+      self._towerAgent.gameOver(score)
 
 
 

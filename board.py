@@ -2,6 +2,13 @@ import pygame
 import math
 
 from tower import Tower
+from unit import Unit
+
+class BoardState:
+   def __init__(self, stepCount, unitsDeployed, towersDeployed):
+        self.stepCount = stepCount
+        self.unitsDeployed = unitsDeployed
+        self.towersDeployed = towersDeployed
 
 class Board:
     def __init__(self, offset_x, offset_y):
@@ -31,6 +38,9 @@ class Board:
         self._bullets.append(bullet)
 
     def step(self):
+        for unit in self._units:
+            unit.step(self)
+
         # Check for updates on all units
         for unit in self._units:
             if unit._shouldDestroy:
@@ -67,6 +77,24 @@ class Board:
                     continue
                 self._towers[i][j].step(self)
 
+    # The state of the board at a given step (used by the generator)
+    def getState(self, stepCount):
+        towerCount = 0
+        for col in range(0, self._width):
+            for row in range(0, self._height):
+                towerCount += 1
+        return BoardState(stepCount, len(self._units), towerCount)
+
+    # The score for the game (used by the generator)
+    def getScore(self):
+        return 10 - len(self._units)
+
+    def execute(self, action):
+        if action.name == "PlaceUnitAction":
+            self.add_unit(Unit(action.x, -2))
+        elif action.name == "PlaceTowerAction":
+            self.add_tower(Tower(action.x, action.y))
+
     def distance(self, obj1, obj2):
         return math.sqrt(pow(obj1._x - obj2._x, 2) + pow(obj1._y - obj2._y, 2))
 
@@ -85,10 +113,10 @@ class Board:
                              (self._offset_x + self._width * self._cell_size, y))
 
         # Draws mouse tower
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        if self.contains_point(mouse_x, mouse_y):
-            s = Tower._image_transparent.copy()
-            screen.blit(s, self.trunc_screen(mouse_x, mouse_y))
+        # mouse_x, mouse_y = pygame.mouse.get_pos()
+        # if self.contains_point(mouse_x, mouse_y):
+        #     s = Tower._image_transparent.copy()
+        #     screen.blit(s, self.trunc_screen(mouse_x, mouse_y))
 
         # Draws towers
         for i in range(self._width):

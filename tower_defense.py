@@ -5,7 +5,7 @@ from board import Board
 from unit_agent import UnitAgent
 from tower import Tower
 from tower_agent import TowerAgent
-
+from generator import Generator
 
 class App:
     def __init__(self):
@@ -13,6 +13,7 @@ class App:
         self._image_surf = None
         self._board = None
         self._agents = [TowerAgent(10), UnitAgent(10)]
+        self._generator = Generator()
 
 
     def on_init(self):
@@ -22,8 +23,9 @@ class App:
         self._board = Board(0, 64)
         self._steps = 0
 
-        for agent in self._agents:
-            agent.init(self._board)
+        # for agent in self._agents:
+        #     agent.init(self._board)
+        self._generator.init()
 
 
     def on_event(self, event):
@@ -35,6 +37,8 @@ class App:
                 self._running = False
             elif event.key == K_SPACE:
                 self.on_init()
+                # self._board = Board(0, 64)
+                # self._steps = 0
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left mouse button
@@ -46,18 +50,22 @@ class App:
                 self._board.add_tower(tower)
 
     def on_loop(self):
-        for agent in self._agents:
-            agent.step(self._board)
+        # for agent in self._agents:
+        #     agent.step(self._board)
+        self._generator.step(self._steps, self._board)
         self._board.step()
 
     def on_render(self):
         self._screen.fill((0, 0, 0))
         
         self._board.draw(self._screen)
-        xCoord = 10
-        for agent in self._agents:
-            agent.render(self._screen, xCoord, 10)
-            xCoord += (self._board._width * self._board._cell_size) / len(self._agents)
+        # xCoord = 10
+        # for agent in self._agents:
+        #     agent.render(self._screen, xCoord, 10)
+        #     xCoord += (self._board._width * self._board._cell_size) / len(self._agents)
+        myfont = pygame.font.SysFont("monospace", 15)
+        label = myfont.render("Step: {0}".format(self._steps), 1, (255,255,0))
+        self._screen.blit(label, (10, 10))
 
         pygame.display.flip()
 
@@ -75,7 +83,9 @@ class App:
             if self._steps < 1000:
                 self.on_loop()
                 self.on_render()
-                self._steps += 1
+            elif self._steps == 1000:
+                self._generator.gameOver(self._board)
+            self._steps += 1
         self.on_cleanup()
 
 
