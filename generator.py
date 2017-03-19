@@ -132,16 +132,16 @@ class TowerAgent:
 class Generator:
    def __init__(self):
       self._unitAgent = StaticUnitAgent([
-         ActionState(BoardState(10, 0, 0), PlaceUnitAction(randint(0, 9)), None),
-         ActionState(BoardState(50, 0, 0), PlaceUnitAction(randint(0, 9)), None),
-         ActionState(BoardState(100, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(0, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(75, 0, 0), PlaceUnitAction(randint(0, 9)), None),
          ActionState(BoardState(150, 0, 0), PlaceUnitAction(randint(0, 9)), None),
-         ActionState(BoardState(200, 0, 0), PlaceUnitAction(randint(0, 9)), None),
-         ActionState(BoardState(250, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(225, 0, 0), PlaceUnitAction(randint(0, 9)), None),
          ActionState(BoardState(300, 0, 0), PlaceUnitAction(randint(0, 9)), None),
-         ActionState(BoardState(350, 0, 0), PlaceUnitAction(randint(0, 9)), None),
-         ActionState(BoardState(400, 0, 0), PlaceUnitAction(randint(0, 9)), None),
-         ActionState(BoardState(450, 0, 0), PlaceUnitAction(randint(0, 9)), None)
+         ActionState(BoardState(375, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(450, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(525, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(600, 0, 0), PlaceUnitAction(randint(0, 9)), None),
+         ActionState(BoardState(675, 0, 0), PlaceUnitAction(randint(0, 9)), None)
       ])
 
    def init(self):
