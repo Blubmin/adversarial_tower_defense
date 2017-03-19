@@ -5,10 +5,16 @@ from tower import Tower
 from unit import Unit
 
 class BoardState:
-   def __init__(self, stepCount, unitsDeployed, towersDeployed):
+    def __init__(self, stepCount, unitsDeployed, towersDeployed):
         self.stepCount = stepCount
         self.unitsDeployed = unitsDeployed
         self.towersDeployed = towersDeployed
+    def distToState(self, state):
+        dist = abs(self.stepCount - state.stepCount)
+        dist += abs(self.unitsDeployed - state.unitsDeployed)
+        dist += abs(self.towersDeployed - state.towersDeployed)
+        return dist
+
 
 class Board:
     def __init__(self, offset_x, offset_y):
@@ -20,6 +26,7 @@ class Board:
         self._towers = [[None for x in range(self._height)] for x in range(self._width)]
         self._units = []
         self._bullets = []
+        self._unitsThatReachedGoal = 0
 
     def hasTower(self, x, y):
         if x < 0 or x >= self._width:
@@ -47,6 +54,7 @@ class Board:
                 self._units.remove(unit)
 
             elif unit._y > self._height:
+                self._unitsThatReachedGoal += 1
                 unit.setIsAtGoal()
                 self._units.remove(unit)
 
@@ -87,7 +95,7 @@ class Board:
 
     # The score for the game (used by the generator)
     def getScore(self):
-        return 10 - len(self._units)
+        return 10 - len(self._units) - self._unitsThatReachedGoal
 
     def execute(self, action):
         if action.name == "PlaceUnitAction":

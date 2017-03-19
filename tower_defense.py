@@ -14,6 +14,7 @@ class App:
         self._board = None
         self._agents = [TowerAgent(10), UnitAgent(10)]
         self._generator = Generator()
+        self._gamesPlayed = 0
 
 
     def on_init(self):
@@ -82,9 +83,12 @@ class App:
                 self.on_event(event)
             if self._steps < 1000:
                 self.on_loop()
-                self.on_render()
+                if self._gamesPlayed >= 100:
+                    self.on_render()
             elif self._steps == 1000:
+                self._gamesPlayed += 1
                 self._generator.gameOver(self._board)
+                self.on_init()
             self._steps += 1
         self.on_cleanup()
 

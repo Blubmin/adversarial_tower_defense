@@ -63,7 +63,7 @@ class Unit:
 
 
 def astar(unit, board):
-    print("({0},{1})".format(unit._x, unit._y))
+    # print("({0},{1})".format(unit._x, unit._y))
     start = (int(unit._x+0.01), int(unit._y+0.01), None, 0) # (x, y, parent, g-score)
     goalY = board._height
 
@@ -71,7 +71,7 @@ def astar(unit, board):
     if unit._y == -1:
         start = (int(unit._x+0.01), int(unit._y-0.01), None, 0)
 
-    print("Unit ({0},{1})".format(start[0], start[1]))
+    # print("Unit ({0},{1})".format(start[0], start[1]))
     if board.hasTower(start[0], start[1]):
         print("Unit is on tower")
 
