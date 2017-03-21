@@ -35,12 +35,6 @@ class BoardState:
             else:
                 self.unitsOnRightSide += 1
 
-    def distToState(self, state):
-        dist = 0
-        dist += abs(self.unitsDeployed - state.unitsDeployed)
-        dist += abs(self.towersDeployed - state.towersDeployed)
-        return dist
-
     def normalizedDistToState(self, boardState):
         thisVector = []
         otherVector = []
