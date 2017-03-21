@@ -67,6 +67,7 @@ class Board:
         self._width = 10
         self._height = 10
         self._towers = [[None for x in range(self._height)] for x in range(self._width)]
+        self._last_tower = None
         self._units = []
         self._bullets = []
         self._unitsThatReachedGoal = 0
@@ -81,6 +82,11 @@ class Board:
 
     def add_tower(self, tower):
         self._towers[tower._x][tower._y] = tower
+        if not self.path_exists():
+            self._towers[tower._x][tower._y] = None
+            return False
+        self._last_tower = tower
+        return True
 
     def add_unit(self, unit):
         self._units.append(unit)
@@ -195,3 +201,40 @@ class Board:
     def contains_point(self, x, y):
         return (self._offset_x <= x < self._offset_x + self._width * self._cell_size
                 and self._offset_y <= y < self._offset_y + self._height * self._cell_size)
+
+    def path_exists(self):
+
+        open_nodes = []
+
+        for x in range(len(self._towers[0])):
+            if self.hasTower(x, 0):
+                continue
+
+            nodes = [[False for x in range(0, self._height)] for x in range(0, self._width)]
+            nodes[x][0] = True
+            open_nodes.append((0, (x, 0)))
+
+            while len(open_nodes) > 0:
+                node = open_nodes.pop(0)
+
+                if node[1][1] is 9:
+                    return True
+
+                for i in range(max(0, node[1][0] - 1), min(self._width, node[1][0] + 2)):
+                    for j in range(max(0, node[1][1] - 1), min(self._height, node[1][1] + 2)):
+                        if self.hasTower(i, j):
+                            continue
+                        if i is node[1][0] and j is node[1][1]:
+                            continue
+                        if i is not node[1][0] and j is not node[1][1]:
+                            continue
+                        if nodes[i][j]:
+                            continue
+
+
+                        open_nodes.append((node[0] + 1, (i, j)))
+                        nodes[i][j] = True
+
+                open_nodes.sort(key=lambda n: n[0])
+
+        return False
