@@ -38,3 +38,11 @@ class TowerAgent:
         myfont = pygame.font.SysFont("monospace", 15)
         label = myfont.render("Tower Score: {0}".format(self._score), 1, (255,255,0))
         screen.blit(label, (xCoord, yCoord))
+
+    def place_of_last_tower(self, board):
+        if board._last_tower is None:
+            return None
+
+        tower = Tower(board._last_tower._x - 1, board._last_tower._y)
+        board.add_tower(tower)
+        return None

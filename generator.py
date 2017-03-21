@@ -98,9 +98,9 @@ def GetNearestState(boardState):
    for state in savedStates:
       if closestDist == None:
          closestState = state
-         closestDist = boardState.distToState(state.boardState)
+         closestDist = boardState.normalizedDistToState(state.boardState)
       else:
-         dist = boardState.distToState(state.boardState)
+         dist = boardState.normalizedDistToState(state.boardState)
          if dist < closestDist:
             closestState = state
             closestDist = dist
@@ -146,7 +146,7 @@ class TowerAgent:
    def step2(self, board, stepCount):
       state = board.getState()
       nearestState = GetNearestState(state)
-      dist = state.distToState(nearestState.boardState)
+      dist = state.normalizedDistToState(nearestState.boardState)
       print("Dist to nearest state: ", dist)
       print("Score of nearest state: ", nearestState.score)
       if nearestState.score >= 8 and dist < 10:

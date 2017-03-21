@@ -85,7 +85,7 @@ class App:
                 self.on_loop()
                 if self._gamesPlayed >= 100:
                     self.on_render()
-            elif self._steps == 1000:
+            elif self._steps >= 1000:
                 self._gamesPlayed += 1
                 self._generator.gameOver(self._board)
                 self.on_init()
