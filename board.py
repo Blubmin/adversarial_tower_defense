@@ -42,8 +42,10 @@ class BoardState:
         thisTotal = 0.0
         otherTotal = 0.0
         for key in self.__dict__:
-            thisTotal += self.__dict__[key]
-            otherTotal += boardState.__dict__[key]
+            thisTotal += pow(self.__dict__[key], 2)
+            otherTotal += pow(boardState.__dict__[key], 2)
+        thisTotal = math.sqrt(thisTotal)
+        otherTotal = math.sqrt(otherTotal)
         # Normalize the state by dividing by the sum
         for key in self.__dict__:
             thisVector.append(self.__dict__[key] / thisTotal)
@@ -134,7 +136,7 @@ class Board:
 
     # The score for the game (used by the generator)
     def getScore(self):
-        return 10 - len(self._units) - self._unitsThatReachedGoal
+        return self._unitsDestroyed
 
     def execute(self, action):
         if action.name == "PlaceUnitAction":

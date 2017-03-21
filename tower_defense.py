@@ -68,6 +68,9 @@ class App:
         label = myfont.render("Step: {0}".format(self._steps), 1, (255,255,0))
         self._screen.blit(label, (10, 10))
 
+        label = myfont.render("Score: {0}".format(self._board.getScore()), 1, (255,255,0))
+        self._screen.blit(label, ((self._board._width * self._board._cell_size) / 2, 10))
+
         pygame.display.flip()
 
     def on_cleanup(self):

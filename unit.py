@@ -16,7 +16,7 @@ class Unit:
         self._speed = 0.05
         self._direction = None
         self._nextNode = None
-        self._health = 150
+        self._health = 200
         self._shouldDestroy = False
         self._isAtGoal = False
 
