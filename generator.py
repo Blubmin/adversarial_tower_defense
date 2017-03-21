@@ -92,19 +92,26 @@ def SaveState(actionState):
    if bestScore == actionState.score:
       savedStates.append(actionState)
 
+# def GetNearestState(boardState):
+#    closestState = None
+#    closestDist = None
+#    for state in savedStates:
+#       if closestDist == None:
+#          closestState = state
+#          closestDist = boardState.normalizedDistToState(state.boardState)
+#       else:
+#          dist = boardState.normalizedDistToState(state.boardState)
+#          if dist < closestDist:
+#             closestState = state
+#             closestDist = dist
+#    return closestState
+
 def GetNearestState(boardState):
-   closestState = None
-   closestDist = None
-   for state in savedStates:
-      if closestDist == None:
-         closestState = state
-         closestDist = boardState.normalizedDistToState(state.boardState)
-      else:
-         dist = boardState.normalizedDistToState(state.boardState)
-         if dist < closestDist:
-            closestState = state
-            closestDist = dist
-   return closestState
+   sortedStates = sorted(savedStates, key=lambda state: boardState.normalizedDistToState(state.boardState))
+   for state in sortedStates:
+      if state.score >= 6:
+         return state
+   return sortedStates[0]
 
 def GetNearestUnitPlacementState(boardState):
    pass
@@ -149,7 +156,7 @@ class TowerAgent:
       dist = state.normalizedDistToState(nearestState.boardState)
       print("Dist to nearest state: ", dist)
       print("Score of nearest state: ", nearestState.score)
-      if nearestState.score >= 8 and dist < 10:
+      if nearestState.score >= 6 and dist < 0.5:
          if not (nearestState.action is NoAction):
             if board.hasTower(nearestState.action.x, nearestState.action.y):
                return NoAction()
