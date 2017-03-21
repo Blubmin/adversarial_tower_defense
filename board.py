@@ -134,7 +134,7 @@ class Board:
 
     # The score for the game (used by the generator)
     def getScore(self):
-        return 10 - len(self._units) - self._unitsThatReachedGoal
+        return self._unitsDestroyed
 
     def execute(self, action):
         if action.name == "PlaceUnitAction":

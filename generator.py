@@ -107,11 +107,12 @@ def SaveState(actionState):
 #    return closestState
 
 def GetNearestState(boardState):
+   # Sort states based on distance
    sortedStates = sorted(savedStates, key=lambda state: boardState.normalizedDistToState(state.boardState))
-   for state in sortedStates:
-      if state.score >= 6:
-         return state
-   return sortedStates[0]
+   # Sort closest 10 states based on score
+   closestStates = sorted(sortedStates[0:10], key=lambda state: state.score)
+   # Return best scoring of 10-closest states
+   return closestStates[0]
 
 def GetNearestUnitPlacementState(boardState):
    pass
@@ -208,7 +209,7 @@ class Generator:
       self._unitAgent.gameOver(score)
       self._towerAgent.gameOver(score)
       # print(savedStates)
-      print("Game ", self.gamesPlayed, " Finished")
+      print("Game {0} Finished (score = {1})".format(self.gamesPlayed, score))
       self.gamesPlayed += 1
 
 
