@@ -176,16 +176,16 @@ class Generator:
 
    def init(self):
       self._unitAgent = StaticUnitAgent([
-         ActionState(0, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(75, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(150, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(225, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(300, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(375, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(450, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(525, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(600, None, PlaceUnitAction(randint(0, 9)), None),
-         ActionState(675, None, PlaceUnitAction(randint(0, 9)), None)
+         ActionState(0, None, PlaceUnitAction(9), None),
+         ActionState(75, None, PlaceUnitAction(9), None),
+         ActionState(150, None, PlaceUnitAction(9), None),
+         ActionState(225, None, PlaceUnitAction(9), None),
+         ActionState(300, None, PlaceUnitAction(9), None),
+         ActionState(375, None, PlaceUnitAction(9), None),
+         ActionState(450, None, PlaceUnitAction(9), None),
+         ActionState(525, None, PlaceUnitAction(9), None),
+         ActionState(600, None, PlaceUnitAction(9), None),
+         ActionState(675, None, PlaceUnitAction(9), None)
       ])
       self._towerAgent = TowerAgent()
       self._towerAgent.gamesPlayed = self.gamesPlayed
