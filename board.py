@@ -80,7 +80,11 @@ class Board:
 
     def add_tower(self, tower):
         self._towers[tower._x][tower._y] = tower
+        if not self.path_exists():
+            self._towers[tower._x][tower._y] = None
+            return False
         self._last_tower = tower
+        return True
 
     def add_unit(self, unit):
         self._units.append(unit)

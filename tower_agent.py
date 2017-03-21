@@ -1,4 +1,5 @@
 import pygame
+from copy import deepcopy
 
 from random import randint
 from tower import Tower
