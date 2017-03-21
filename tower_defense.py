@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 
 from board import Board
-from unit_agent import UnitAgent
+from unit_agent import RandomUnitAgent
 from tower import Tower
 from tower_agent import TowerAgent
 from generator import Generator
@@ -12,7 +12,7 @@ class App:
         self._running = True
         self._image_surf = None
         self._board = None
-        self._agents = [TowerAgent(10), UnitAgent(10)]
+        self._agents = [TowerAgent(10), RandomUnitAgent(10, 10, 1000)]
         self._generator = Generator()
         self._gamesPlayed = 0
 

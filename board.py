@@ -5,14 +5,59 @@ from tower import Tower
 from unit import Unit
 
 class BoardState:
-    def __init__(self, stepCount, unitsDeployed, towersDeployed):
-        self.stepCount = stepCount
-        self.unitsDeployed = unitsDeployed
-        self.towersDeployed = towersDeployed
+    def __init__(self, board):
+        self.unitsDeployed = len(board._units) + board._unitsDestroyed + board._unitsThatReachedGoal
+        self.towersDeployed = 0
+        self.towersInUpperLeft = 0
+        self.towersInUpperRight = 0
+        self.towersInLowerLeft = 0
+        self.towersInLowerRight = 0
+        self.unitsOnLeftSide = 0
+        self.unitsOnRightSide = 0
+        for col in range(0, board._width):
+            for row in range(0, board._height):
+                tower = board._towers[row][col]
+                if not (tower is None):
+                    self.towersDeployed += 1
+                    if tower._x < board._width/2:
+                        if tower._y < board._height/2:
+                            self.towersInUpperLeft += 1
+                        else:
+                            self.towersInLowerLeft += 1
+                    else:
+                        if tower._y < board._height/2:
+                            self.towersInUpperRight += 1
+                        else:
+                            self.towersInLowerRight += 1
+        for unit in board._units:
+            if unit._x < board._width/2:
+                self.unitsOnLeftSide += 1
+            else:
+                self.unitsOnRightSide += 1
+
     def distToState(self, state):
-        dist = abs(self.stepCount - state.stepCount)
+        dist = 0
         dist += abs(self.unitsDeployed - state.unitsDeployed)
         dist += abs(self.towersDeployed - state.towersDeployed)
+        return dist
+
+    def normalizedDistToState(self, boardState):
+        thisVector = []
+        otherVector = []
+        # Find the sum of all the state values
+        thisTotal = 0.0
+        otherTotal = 0.0
+        for key in self.__dict__:
+            thisTotal += self.__dict__[key]
+            otherTotal += boardState.__dict__[key]
+        # Normalize the state by dividing by the sum
+        for key in self.__dict__:
+            thisVector.append(self.__dict__[key] / thisTotal)
+            otherVector.append(boardState.__dict__[key] / otherTotal)
+        # Get the dist between the normalized states (max distance would be 1)
+        dist = 0.0
+        for i in range(0, len(thisVector)):
+            dist += abs(thisVector[i] - otherVector[i])
         return dist
 
 
@@ -27,6 +72,7 @@ class Board:
         self._units = []
         self._bullets = []
         self._unitsThatReachedGoal = 0
+        self._unitsDestroyed = 0
 
     def hasTower(self, x, y):
         if x < 0 or x >= self._width:
@@ -51,6 +97,7 @@ class Board:
         # Check for updates on all units
         for unit in self._units:
             if unit._shouldDestroy:
+                self._unitsDestroyed += 1
                 self._units.remove(unit)
 
             elif unit._y > self._height:
@@ -86,12 +133,8 @@ class Board:
                 self._towers[i][j].step(self)
 
     # The state of the board at a given step (used by the generator)
-    def getState(self, stepCount):
-        towerCount = 0
-        for col in range(0, self._width):
-            for row in range(0, self._height):
-                towerCount += 1
-        return BoardState(stepCount, len(self._units), towerCount)
+    def getState(self):
+        return BoardState(self)
 
     # The score for the game (used by the generator)
     def getScore(self):
