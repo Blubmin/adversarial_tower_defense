@@ -48,8 +48,10 @@ class BoardState:
         otherTotal = math.sqrt(otherTotal)
         # Normalize the state by dividing by the sum
         for key in self.__dict__:
-            thisVector.append(self.__dict__[key] / thisTotal)
-            otherVector.append(boardState.__dict__[key] / otherTotal)
+            if thisTotal > 0:
+                thisVector.append(self.__dict__[key] / thisTotal)
+            if otherTotal > 0:
+                otherVector.append(boardState.__dict__[key] / otherTotal)
         # Get the dist between the normalized states (max distance would be 1)
         dist = 0.0
         for i in range(0, len(thisVector)):

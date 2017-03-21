@@ -15,6 +15,7 @@ class App:
         self._agents = [TowerAgent(10), RandomUnitAgent(10, 10, 1000)]
         self._generator = Generator()
         self._gamesPlayed = 0
+        self._renderFullGame = False
 
 
     def on_init(self):
@@ -38,8 +39,8 @@ class App:
                 self._running = False
             elif event.key == K_SPACE:
                 self.on_init()
-                # self._board = Board(0, 64)
-                # self._steps = 0
+            elif event.key == K_r:
+                self._renderFullGame = not self._renderFullGame
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left mouse button
@@ -86,8 +87,10 @@ class App:
                 self.on_event(event)
             if self._steps < 1000:
                 self.on_loop()
-                if self._gamesPlayed >= 100:
+                if self._renderFullGame:
                     self.on_render()
+                # if self._gamesPlayed >= 100:
+                #     self.on_render()
             elif self._steps == 1000:
                 self.on_render()
                 self._gamesPlayed += 1
