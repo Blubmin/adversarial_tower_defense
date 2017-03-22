@@ -105,7 +105,7 @@ class Board:
         if self.hasTower(tower._x, tower._y):
             return False
         self._towers[tower._x][tower._y] = tower
-        if not self.path_exists():
+        if not (self.path_exists() and self.unit_path_exists()):
             self._towers[tower._x][tower._y] = None
             return False
         self._tower_list += [tower]
@@ -239,6 +239,10 @@ class Board:
     def contains_point(self, x, y):
         return (self._offset_x <= x < self._offset_x + self._width * self._cell_size
                 and self._offset_y <= y < self._offset_y + self._height * self._cell_size)
+
+    def unit_path_exists(self):
+        paths = [self.path_from(u._lastNode[0], u._lastNode[1]) is not None for u in self._units if u._y >= 0]
+        return reduce(lambda u1, u2: u1 and u2, paths, True)
 
     def path_exists(self):
         for x in range(len(self._towers[0])):
