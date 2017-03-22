@@ -1,7 +1,6 @@
 import pygame
-from copy import deepcopy
 
-from random import randint
+from random import randrange
 from tower import Tower
 
 class TowerAgent:
@@ -26,11 +25,11 @@ class TowerAgent:
     def placeTower(self, board):
         # if self._placementDelay <= 0:
         #     self._placementDelay = randint(10, 100)
-            randX = randint(0, board._width - 1)
-            randY = randint(0, board._width - 1)
+            randX = randrange(0, board._width)
+            randY = randrange(0, board._width)
             while board._towers[randX][randY] != None:
-                randX = randint(0, board._width - 1)
-                randY = randint(0, board._width - 1)
+                randX = randrange(0, board._width)
+                randY = randrange(0, board._width)
             tower = Tower(randX, randY)
             self._towers.append(tower)
             board.add_tower(tower)
@@ -40,10 +39,35 @@ class TowerAgent:
         label = myfont.render("Tower Score: {0}".format(self._score), 1, (255,255,0))
         screen.blit(label, (xCoord, yCoord))
 
-    def place_of_last_tower(self, board):
+    def place_x_y_of_last_tower(self, board, x, y):
         if board._last_tower is None:
-            return None
+            return False
+        tower = Tower(board._last_tower._x + x, board._last_tower._y + y)
+        return board.add_tower(tower)
 
-        tower = Tower(board._last_tower._x - 1, board._last_tower._y)
-        board.add_tower(tower)
-        return None
+    def place_left_of_last_tower(self, board):
+        self.place_x_y_of_last_tower(board, -1, 0)
+
+    def place_right_of_last_tower(self, board):
+        self.place_x_y_of_last_tower(board, 1, 0)
+
+    def place_up_of_last_tower(self, board):
+        self.place_x_y_of_last_tower(board, 0, -1)
+
+    def place_down_of_last_tower(self, board):
+        self.place_x_y_of_last_tower(board, 0, 1)
+
+    def place_randomly(self, board):
+        tower = Tower(randrange(0, board._width), randrange(0, board._height))
+
+        while not board.add_tower(tower):
+            tower = Tower(randrange(0, board._width), randrange(0, board._height))
+
+    def place_along_path(self, board):
+        paths = map(lambda u: board.path_from(int(u._x), int(u._y)), board._units)
+        paths.sort(key=lambda p: len(p))
+        for cell in paths[0][1:]:
+            if not board.add_tower(Tower(cell[0], cell[1])):
+                continue
+            return True
+        return False

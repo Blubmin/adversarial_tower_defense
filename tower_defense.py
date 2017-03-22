@@ -53,7 +53,7 @@ class App:
     def on_loop(self):
         # for agent in self._agents:
         #     agent.step(self._board)
-        self._generator.step(self._steps, self._board)
+        #self._generator.step(self._steps, self._board)
         self._board.step()
 
     def on_render(self):
@@ -84,14 +84,14 @@ class App:
             start = pygame.time.get_ticks()
             for event in pygame.event.get():
                 self.on_event(event)
-            if self._steps < 1000:
-                self.on_loop()
-                if self._gamesPlayed >= 100:
-                    self.on_render()
-            elif self._steps >= 1000:
-                self._gamesPlayed += 1
-                self._generator.gameOver(self._board)
-                self.on_init()
+            #if self._steps < 1000:
+            self.on_loop()
+            #    if self._gamesPlayed >= 100:
+            self.on_render()
+            #elif self._steps >= 1000:
+            #    self._gamesPlayed += 1
+            #    self._generator.gameOver(self._board)
+            #    self.on_init()
             self._steps += 1
         self.on_cleanup()
 

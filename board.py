@@ -79,6 +79,8 @@ class Board:
         return self._towers[x][y] != None
 
     def add_tower(self, tower):
+        if self.hasTower(tower._x, tower._y):
+            return False
         self._towers[tower._x][tower._y] = tower
         if not self.path_exists():
             self._towers[tower._x][tower._y] = None
@@ -201,38 +203,47 @@ class Board:
                 and self._offset_y <= y < self._offset_y + self._height * self._cell_size)
 
     def path_exists(self):
+        for x in range(len(self._towers[0])):
+            if self.path_from(x, 0) is None:
+                continue
+            return True
+        return False
+
+    def path_from(self, x, y):
+        if self.hasTower(x, y):
+            return None
 
         open_nodes = []
+        nodes = [[(False, -1, (-1, -1)) for x in range(0, self._height)] for x in range(0, self._width)]
+        nodes[x][y] = (True, 0, None)
+        open_nodes.append((0, (x, y)))
 
-        for x in range(len(self._towers[0])):
-            if self.hasTower(x, 0):
-                continue
+        while len(open_nodes) > 0:
+            node = open_nodes.pop(0)
 
-            nodes = [[False for x in range(0, self._height)] for x in range(0, self._width)]
-            nodes[x][0] = True
-            open_nodes.append((0, (x, 0)))
+            if node[1][1] is 9:
+                path = []
+                path.append(node[1])
+                temp = nodes[node[1][0]][node[1][1]]
+                while temp[2] is not None:
+                    path = [temp[2]] + path
+                    temp = nodes[temp[2][0]][temp[2][1]]
+                return path
 
-            while len(open_nodes) > 0:
-                node = open_nodes.pop(0)
+            for i in range(max(0, node[1][0] - 1), min(self._width, node[1][0] + 2)):
+                for j in range(max(0, node[1][1] - 1), min(self._height, node[1][1] + 2)):
+                    if self.hasTower(i, j):
+                        continue
+                    if i is node[1][0] and j is node[1][1]:
+                        continue
+                    if i is not node[1][0] and j is not node[1][1]:
+                        continue
+                    if nodes[i][j][0] and node[0] + 1 >= nodes[i][j][1]:
+                        continue
 
-                if node[1][1] is 9:
-                    return True
+                    open_nodes.append((node[0] + 1, (i, j)))
+                    nodes[i][j] = (True, node[0] + 1, node[1])
 
-                for i in range(max(0, node[1][0] - 1), min(self._width, node[1][0] + 2)):
-                    for j in range(max(0, node[1][1] - 1), min(self._height, node[1][1] + 2)):
-                        if self.hasTower(i, j):
-                            continue
-                        if i is node[1][0] and j is node[1][1]:
-                            continue
-                        if i is not node[1][0] and j is not node[1][1]:
-                            continue
-                        if nodes[i][j]:
-                            continue
+            open_nodes.sort(key=lambda n: n[0])
 
-
-                        open_nodes.append((node[0] + 1, (i, j)))
-                        nodes[i][j] = True
-
-                open_nodes.sort(key=lambda n: n[0])
-
-        return False
+        return None
