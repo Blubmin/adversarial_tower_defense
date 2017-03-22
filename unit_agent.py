@@ -71,7 +71,7 @@ class RandomUnitAgent:
         self._maxUnits = maxUnits
         # Generate random states for when to place units
         for i in range(0, self._maxUnits):
-            time = randint(0, maxSteps-100)
+            time = randint(0, maxSteps-300)
             posX = randint(0, boardWidth-1)
             self._placementTriggers.append((time, posX))
         self._placementTriggers = sorted(self._placementTriggers, key=lambda student: student[0])
@@ -83,14 +83,15 @@ class RandomUnitAgent:
             # If the step is less than the next placement trigger, place a unit
             if self._placementTriggers[unitsPlaced][0] <= stepCount:
                 action = PlaceUnitAction(self._placementTriggers[unitsPlaced][1])
-                actionState = ActionState(board.getState(), action, None)
+                actionState = ActionState(stepCount, board.getState(), action, None)
                 self._actionStates.append(actionState)
+                return action
         return NoAction()
 
     def gameOver(self, score):
         for actionState in self._actionStates:
             actionState.score = score
-            SaveState(actionState)
+            # SaveState(actionState)
 
 
 class SmartUnitAgent:
@@ -105,7 +106,7 @@ class SmartUnitAgent:
             # If the step is less than the next placement trigger, place a unit
             if self._placementTriggers[unitsPlaced][0] <= stepCount:
                 action = PlaceUnitAction(self._placementTriggers[unitsPlaced][1])
-                actionState = ActionState(board.getState(), action, None)
+                actionState = ActionState(stepCount, board.getState(), action, None)
                 self._actionStates.append(actionState)
         return NoAction()
 
@@ -113,4 +114,20 @@ class SmartUnitAgent:
         for actionState in self._actionStates:
             actionState.score = score
             SaveState(actionState)
+
+
+
+
+# Unit types
+# Unit behaviors
+# shortest path
+# avoid towers
+# group together
+
+# Try implementing flocking-type behavior
+
+
+
+
+
 
