@@ -82,16 +82,19 @@ class Board:
         self._score = 0
 
     def hasUnit(self, x, y):
-        return reduce(lambda u1, u2: u1 and u2, map(lambda u: int(u._x) == x and int(u._y) == y, self._units))
+        return reduce(lambda u1, u2: u1 and u2, map(lambda u: int(u._x) == x and int(u._y) == y, self._units), False)
+
+    def isInBounds(self, x, y):
+        return 0 <= x < self._width and 0 <= y < self._height
 
     def hasTower(self, x, y):
-        if x < 0 or x >= self._width:
-            return False
-        if y < 0 or y >= self._width:
+        if not self.isInBounds(x, y):
             return False
         return self._towers[x][y] != None
 
     def add_tower(self, tower):
+        if not self.isInBounds(tower._x, tower._y):
+            return False
         if self.hasUnit(tower._x, tower._y):
             return False
         if not (0 <= tower._x < self._width and 0 <= tower._y < self._height):
@@ -234,6 +237,9 @@ class Board:
         return False
 
     def path_from(self, x, y):
+        if not self.isInBounds(x, y):
+            return None
+
         if self.hasTower(x, y):
             return None
 

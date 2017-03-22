@@ -18,6 +18,9 @@ class TowerState:
         self.unitsOnLeftSide = reduce(iadd, map(lambda t: 1 if t._x < 5 else 0, board._units), 0)
         self.unitsOnRightSide  = reduce(iadd, map(lambda t: 1 if t._x >= 5 else 0, board._units), 0)
 
+    # def dist(self, other):
+
+
 class TowerAgent:
     def __init__(self, maxUnits):
         self._towers = []
