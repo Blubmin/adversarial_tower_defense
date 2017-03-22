@@ -163,7 +163,10 @@ class Board:
 
     # The score for the game (used by the generator)
     def getScore(self):
-        return self._score
+        aliveUnitsTotalDistance = 0
+        for unit in self._units:
+            aliveUnitsTotalDistance += int(unit._y)
+        return self._score + aliveUnitsTotalDistance
 
     def execute(self, action):
         if action.name == "PlaceUnitAction":

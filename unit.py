@@ -15,12 +15,15 @@ class Unit:
         self._y = y
         self._speed = 0.05
         self._direction = None
+        self._lastNode = (x, y)
         self._nextNode = None
         self._health = 300
         self._shouldDestroy = False
         self._isAtGoal = False
         self._dangerMap = [[0 for x in range(10)] for x in range(11)]
         self._safetyMap = [[0 for x in range(10)] for x in range(11)]
+        self._towers = []
+        self._path = []
 
     def setShouldDestroy(self):
         self._shouldDestroy = True
@@ -34,9 +37,22 @@ class Unit:
             self._shouldDestroy = True
 
     def step(self, board):
-        # If at next node in astar, recompute astar
-        if self.isAtNextNode(board) or not self._nextNode:
+        # If no astar has been calculated yet, calculate it
+        if not self._direction:
             astar(self, board)
+        else:
+            # If it is at the next node in the path, and there are still nodes left to be traversed
+            if self.isAtNextNode(board) and len(self._path) > 0:
+                # If tower placements changed, recompute astar
+                if self.didTowerConfigurationChange(board):
+                    astar(self, board)
+                # Else go to next node in path
+                else:
+                    self._lastNode = self._nextNode
+                    self._nextNode = self._path[0]
+                    self._direction = directionFromNodes(self._lastNode, self._nextNode)
+                    self._path = self._path[1:]
+
         # Move in direction
         if self._direction == NORTH:
             self._y -= self._speed
@@ -104,31 +120,18 @@ class Unit:
             for x in range(board._width):
                 print(int(self._safetyMap[y][x]), "", end='')
             print()
-            
-# danger = [[0 for x in range(10)] for x in range(11)]
-# def calculateDanger(board):
-#     # Reset danger map to all 0s
-#     danger2 = [[0 for x in range(board._width)] for x in range(board._height+1)]
-#     towerRange = 2
-#     towerRangeSquared = towerRange * towerRange
-#     # Find all towers on the board
-#     for y in range(board._height):
-#         for x in range(board._width):
-#             # For each tower, add 1 danger to all cells within its range
-#             if board._towers[y][x]:
-#                 print("Found Tower")
-#                 for dy in range(max(0, y-towerRange), min(y+towerRange, board._height)):
-#                     for dx in range(max(0, x-towerRange), min(x+towerRange, board._width-1)):
-#                         # If cell is within tower range
-#                         if pow(y-dy, 2) + pow(x-dx, 2) < towerRangeSquared:
-#                             danger2[dy][dx] += 1
-#                             print(danger2[dy][dx])
-#     danger = danger2
-# def printDangerMap(board):
-#     for y in range(board._height+1):
-#         for x in range(board._width):
-#             print(danger[y][x], "", end='')
-#         print()
+
+    def didTowerConfigurationChange(self, board):
+        newTowers = []
+        for col in range(0, board._width):
+            for row in range(0, board._height):
+                tower = board._towers[row][col]
+                if not (tower is None):
+                    newTowers.append(tower)
+        if self._towers != newTowers:
+            self._towers = newTowers
+            return True
+        return False
 
 
 def astar(unit, board):
@@ -140,12 +143,13 @@ def astar(unit, board):
 
 
     # print("({0},{1})".format(unit._x, unit._y))
-    start = (int(unit._x+0.01), int(unit._y+0.01), None, 0) # (x, y, parent, g-score)
+    start = (unit._lastNode[0], unit._lastNode[1], None, 0)
+    # start = (int(unit._x+0.01), int(unit._y+0.01), None, 0) # (x, y, parent, g-score)
     goalY = board._height
 
     # Fix error where out of bounds (-1) + 0.05 is not the right value (expect -1, get 0)
-    if unit._y == -1:
-        start = (int(unit._x+0.01), int(unit._y-0.01), None, 0)
+    if unit._lastNode[1] <= -0.99:
+        start = (unit._lastNode[0], int(unit._lastNode[1]-0.02), None, 0)
 
     # print("Unit ({0},{1})".format(start[0], start[1]))
     # if board.hasTower(start[0], start[1]):
@@ -191,23 +195,31 @@ def astar(unit, board):
                 openNodes.append(node)
 
 def pathForNode(unit, node, start):
+    unit._path = [(node[0], node[1])]
+
     # Follow path backward to find next action to take
     tempNode = node
     while tempNode[2] != start:
         tempNode = tempNode[2]
+        unit._path = [(tempNode[0], tempNode[1])] + unit._path
 
     # Get direction from next action
     unit._direction = directionFromNodes(start, tempNode)
-    unit._nextNode = (tempNode[0], tempNode[1])
+    unit._nextNode = tempNode#unit._path[0]
+    unit._path = unit._path[1:]
 
 def directionFromNodes(start, next):
-    if next[0] > start[0]:
+    if next[0] - start[0] > 0.01:
+    # if next[0] > start[0]:
         return EAST
-    if next[0] < start[0]:
+    if next[0] - start[0] < -0.01:
+    # if next[0] < start[0]:
         return WEST
-    if next[1] > start[1]:
+    if next[1] - start[1] > 0.01:
+    # if next[1] > start[1]:
         return SOUTH
-    if next[1] < start[1]:
+    if next[1] - start[1] < -0.01:
+    # if next[1] < start[1]:
         return NORTH
     return STOP
 

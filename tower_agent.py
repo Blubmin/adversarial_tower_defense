@@ -51,6 +51,8 @@ class TowerAgent:
         if board._num_towers >= 10:
             return None
         tower_data = MongoWrapper().get_tower_data()
+        # for data in tower_data:
+        #     print(data)
 
         count = board._num_towers
         if board._last_tower is None:
