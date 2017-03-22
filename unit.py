@@ -20,6 +20,7 @@ class Unit:
         self._shouldDestroy = False
         self._isAtGoal = False
         self._dangerMap = [[0 for x in range(10)] for x in range(11)]
+        self._safetyMap = [[0 for x in range(10)] for x in range(11)]
 
     def setShouldDestroy(self):
         self._shouldDestroy = True
@@ -77,11 +78,31 @@ class Unit:
                             dist = sqrt(pow(y-dy, 2) + pow(x-dx, 2))
                             if dist < towerRange:
                                 self._dangerMap[dy][dx] += 3#towerRange-dist
+    def calculateSafety(self, board):
+        # Reset safety map to all 0s
+        self._safetyMap = [[0 for x in range(board._width)] for x in range(board._height+1)]
+        unitRange = 2
+        # For each unit on the board
+        for unit in board._units:
+            if unit != self:
+                # Subtract 1 danger from all cells within radius of unit
+                for dy in range(max(0, int(self._y)-unitRange), min(int(self._y)+unitRange, board._height+1)):
+                    for dx in range(max(0, int(self._x)-unitRange), min(int(self._x)+unitRange, board._width)):
+                        # If cell is within tower range
+                        dist = sqrt(pow(int(self._y)-dy, 2) + pow(int(self._x)-dx, 2))
+                        if dist < unitRange:
+                            self._safetyMap[dy][dx] += 1#towerRange-dist
     def printDangerMap(self, board):
         print()
         for y in range(board._height+1):
             for x in range(board._width):
                 print(int(self._dangerMap[y][x]), "", end='')
+            print()
+    def printSafetyMap(self, board):
+        print()
+        for y in range(board._height+1):
+            for x in range(board._width):
+                print(int(self._safetyMap[y][x]), "", end='')
             print()
             
 # danger = [[0 for x in range(10)] for x in range(11)]
@@ -113,7 +134,9 @@ class Unit:
 def astar(unit, board):
     # Calculate danger
     # unit.calculateDanger(board)
+    # unit.calculateSafety(board)
     # unit.printDangerMap(board)
+    # unit.printSafetyMap(board)
 
 
     # print("({0},{1})".format(unit._x, unit._y))
@@ -125,8 +148,8 @@ def astar(unit, board):
         start = (int(unit._x+0.01), int(unit._y-0.01), None, 0)
 
     # print("Unit ({0},{1})".format(start[0], start[1]))
-    if board.hasTower(start[0], start[1]):
-        print("Unit is on tower")
+    # if board.hasTower(start[0], start[1]):
+    #     print("Unit is on tower")
 
     closedNodes = []
     openNodes = []
@@ -191,13 +214,13 @@ def directionFromNodes(start, next):
 def neighbors(unit, board, node):
     neighborNodes = []
     if node[0] > 0:
-        neighborNodes.append((node[0]-1, node[1], node, node[3] + 1 + unit._dangerMap[node[1]][node[0]-1]))
+        neighborNodes.append((node[0]-1, node[1], node, node[3] + 1 + unit._dangerMap[node[1]][node[0]-1] - unit._safetyMap[node[1]][node[0]-1]))
     if node[0] < board._width-1:
-        neighborNodes.append((node[0]+1, node[1], node, node[3] + 1 + unit._dangerMap[node[1]][node[0]+1]))
+        neighborNodes.append((node[0]+1, node[1], node, node[3] + 1 + unit._dangerMap[node[1]][node[0]+1] - unit._safetyMap[node[1]][node[0]+1]))
     if node[1] > 0:
-        neighborNodes.append((node[0], node[1]-1, node, node[3] + 1 + unit._dangerMap[node[1]-1][node[0]]))
+        neighborNodes.append((node[0], node[1]-1, node, node[3] + 1 + unit._dangerMap[node[1]-1][node[0]] - unit._safetyMap[node[1]-1][node[0]]))
     if node[1] < board._height:
-        neighborNodes.append((node[0], node[1]+1, node, node[3] + 1 + unit._dangerMap[node[1]+1][node[0]]))
+        neighborNodes.append((node[0], node[1]+1, node, node[3] + 1 + unit._dangerMap[node[1]+1][node[0]] - unit._safetyMap[node[1]+1][node[0]]))
     return neighborNodes
 
 def removeBestNode(board, openNodes, start, goalY):

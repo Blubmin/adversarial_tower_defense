@@ -118,7 +118,7 @@ class Board:
                 continue
 
             # Check for out of bounds
-            if bullet._x > self._width or bullet._x < 0 or bullet._y > self._height or bullet._y < 0:
+            if bullet._x > self._width or bullet._x < 0 or bullet._y > self._height+2 or bullet._y < -2:
                 bullet.setShouldDestroy()
 
             else:
@@ -146,7 +146,7 @@ class Board:
 
     def execute(self, action):
         if action.name == "PlaceUnitAction":
-            self.add_unit(Unit(action.x, -2))
+            self.add_unit(Unit(action.x, -1))
         elif action.name == "PlaceTowerAction":
             self.add_tower(Tower(action.x, action.y))
 
