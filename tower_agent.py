@@ -51,8 +51,6 @@ class TowerAgent:
         if board._num_towers >= 10:
             return None
         tower_data = MongoWrapper().get_tower_data()
-        for data in tower_data:
-            print(data)
 
         count = board._num_towers
         if board._last_tower is None:
@@ -60,9 +58,10 @@ class TowerAgent:
         else:
             action = choice(self._actions) # Picks a random action
         while not getattr(self, action)(board): # Performs the action
+            assert board._num_towers == count, "{}: actual {} expected {}".format(action, board._num_towers, count)
             action = choice(self._actions)
         self._actions_taken += [(TowerState(board), action)] # Keeps track of actions taken in this game
-        # assert board._num_towers == count + 1, "{}: actual {} expected {}".format(action, board._num_towers, count + 1)
+        assert board._num_towers == count + 1, "{}: actual {} expected {}".format(action, board._num_towers, count + 1)
         return action
 
     def render(self, screen, xCoord, yCoord):
@@ -77,22 +76,25 @@ class TowerAgent:
         return board.add_tower(tower)
 
     def place_left_of_last_tower(self, board):
-        self.place_x_y_of_last_tower(board, -1, 0)
+        return self.place_x_y_of_last_tower(board, -1, 0)
 
     def place_right_of_last_tower(self, board):
-        self.place_x_y_of_last_tower(board, 1, 0)
+        return self.place_x_y_of_last_tower(board, 1, 0)
 
     def place_up_of_last_tower(self, board):
-        self.place_x_y_of_last_tower(board, 0, -1)
+        return self.place_x_y_of_last_tower(board, 0, 1)
 
     def place_down_of_last_tower(self, board):
-        self.place_x_y_of_last_tower(board, 0, 1)
+        return self.place_x_y_of_last_tower(board, 0, -1)
 
     def place_randomly(self, board):
         tower = Tower(randrange(0, board._width), randrange(0, board._height))
 
+        count = board._num_towers
         while not board.add_tower(tower):
+            assert count == board._num_towers, "place along path False error"
             tower = Tower(randrange(0, board._width), randrange(0, board._height))
+        assert count + 1 == board._num_towers, "place along path True error"
         return True
 
     def place_along_path(self, board):
@@ -106,7 +108,10 @@ class TowerAgent:
         if i is len(paths):
             return False
         for cell in paths[i][1:]:
+            count = board._num_towers
             if not board.add_tower(Tower(cell[0], cell[1])):
+                assert count == board._num_towers, "place along path False error"
                 continue
+            assert count + 1 == board._num_towers, "place along path True error"
             return True
         return False
