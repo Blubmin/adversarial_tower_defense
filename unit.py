@@ -39,7 +39,7 @@ class Unit:
 
     def step(self, board):
         # If no astar has been calculated yet, calculate it
-        if not self._direction:
+        if not self._nextNode:
             astar(self, board)
         else:
             # If it is at the next node in the path, and there are still nodes left to be traversed
