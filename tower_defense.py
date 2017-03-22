@@ -18,6 +18,7 @@ class App:
         self._gamesPlayed = 0
         self._renderFullGame = False
         self._paused = False
+        self._debugPath = False
 
 
     def on_init(self):
@@ -46,10 +47,21 @@ class App:
                 self._renderFullGame = not self._renderFullGame
             elif event.key == K_p:
                 self._paused = not self._paused
+            elif event.key == K_u:
+                self._debugPath = not self._debugPath
+                self.on_render()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left mouse button
-                pass
+                x, y = pygame.mouse.get_pos()
+                if not self._board.contains_point(x, y):
+                    return
+                grid_x, grid_y = self._board.screen_to_grid(x, y)
+
+                for unit in self._board._units:
+                    if unit._lastNode[0] == grid_x and unit._lastNode[1] == grid_y or unit._nextNode and unit._nextNode[0] == grid_x and unit._nextNode[1] == grid_y:
+                        unit._drawPath = not unit._drawPath
+                self.on_render()
             if event.button == 3: # Right mouse button
                 x, y = pygame.mouse.get_pos()
                 if not self._board.contains_point(x, y):
@@ -57,6 +69,7 @@ class App:
                 grid_x, grid_y = self._board.screen_to_grid(x, y)
                 tower = Tower(grid_x, grid_y)
                 self._board.add_tower(tower)
+                self.on_render()
 
     def on_loop(self):
         # for agent in self._agents:
@@ -68,6 +81,18 @@ class App:
         self._screen.fill((0, 0, 0))
         
         self._board.draw(self._screen)
+
+        for unit in self._board._units:
+            if unit._drawPath or self._debugPath:
+                for node in unit._path:
+                    nodeX = self._board._offset_x + node[0] * self._board._cell_size
+                    nodeY = self._board._offset_y + node[1] * self._board._cell_size
+                    rect = pygame.Surface((self._board._cell_size, self._board._cell_size))
+                    rect.set_alpha(128)
+                    rect.fill((150,0,0))
+                    self._screen.blit(rect, (nodeX, nodeY))
+                    # pygame.draw.rect(self._screen, (150, 0, 0), (nodeX, nodeY, 32, 32))
+
         # xCoord = 10
         # for agent in self._agents:
         #     agent.render(self._screen, xCoord, 10)
