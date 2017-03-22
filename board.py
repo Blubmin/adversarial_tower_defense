@@ -81,11 +81,11 @@ class Board:
         self._unitsDestroyed = 0
         self._score = 0
 
-    def hasUnit(self, x, y):
-        return reduce(lambda u1, u2: u1 and u2, map(lambda u: int(u._x) == x and int(u._y) == y, self._units), False)
-
     def isInBounds(self, x, y):
         return 0 <= x < self._width and 0 <= y < self._height
+
+    def hasUnit(self, x, y)
+        return reduce(lambda u1, u2: u1 or u2, map(lambda u: int(u._lastNode[0]) == x and int(u._lastNode[1]) == y or int(u._nextNode[0]) == x and int(u._nextNode[1]) == y, self._units), False)
 
     def hasTower(self, x, y):
         if not self.isInBounds(x, y):
