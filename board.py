@@ -82,7 +82,7 @@ class Board:
         self._score = 0
 
     def hasUnit(self, x, y):
-        return reduce(lambda u1, u2: u1 or u2, map(lambda u: int(u._lastNode[0]) == x and int(u._lastNode[1]) == y or int(u._nextNode[0]) == x and int(u._nextNode[1]) == y, self._units), False)
+        return reduce(lambda u1, u2: u1 or u2, map(lambda u: int(u._lastNode[0]) == x and int(u._lastNode[1]) == y or u._nextNode and int(u._nextNode[0]) == x and int(u._nextNode[1]) == y, self._units), False)
 
     def hasTower(self, x, y):
         if x < 0 or x >= self._width:
