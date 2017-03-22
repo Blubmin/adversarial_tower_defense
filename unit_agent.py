@@ -1,9 +1,82 @@
 import pygame
 
 from math import sqrt
-from random import randint
+from random import randint, randrange, choice
 from unit import Unit
 from actions import *
+from mongo_wrapper import MongoWrapper
+
+# place random
+# place right of last unit
+# place left of last unit
+# place same as last unit
+# place random right side
+# place random left side
+# place heavy and slow ditto
+# place fast and light ditto
+
+class UnitAgent:
+    def __init__(self, maxUnits):
+        self._maxUnits = maxUnits
+        self._actions = ["place_randomly",
+                         "place_randomly_right_side",
+                         "place_randomly_left_side",
+                         "place_same_as_last_unit",
+                         "place_left_of_last_unit",
+                         "place_right_of_last_unit"] # Same methods but with heavy and light units
+        self._actions_taken = []
+
+    def init(self, board):
+        for i in range(0, self._maxUnits):
+            self.placeUnit(board)
+
+    def step(self, board):
+        rand = randrange(0, 50)
+        return (self.placeUnit(board) if rand is 1 else None)
+
+    def placeUnit(self, board):
+        if board._num_units >= 10:
+            return None
+        unit_data = MongoWrapper().get_unit_data()
+        # for data in unit_data:
+        #     print(data)
+
+        count = board._num_units
+        if board._last_unit is None:
+            action = "place_randomly"
+        else:
+            action = choice(self._actions) # Picks a random action
+        while not getattr(self, action)(board): # Performs the action
+            action = choice(self._actions)
+        self._actions_taken += [(board.getState(), action)] # Keeps track of actions taken in this game
+        return action
+
+    def gameOver(self, board):
+        unit_data = map( lambda x: {"state": x[0].__dict__, "action": x[1], "score": board.getScore()}, self._actions_taken)
+        MongoWrapper().save_unit_data(unit_data)
+
+    def place_x(self, board, x):
+        unit = Unit(x, -1, randint(0, 2))
+        return board.add_unit(unit)
+    def place_x_of_last_unit(self, board, x):
+        if board._last_unit is None:
+            return False
+        unit = Unit(board._last_unit_initial_location[0] + x, -1, randint(0, 2))
+        return board.add_unit(unit)
+
+    def place_same_as_last_unit(self, board):
+        return self.place_x_of_last_unit(board, 0)
+    def place_left_of_last_unit(self, board):
+        return self.place_x_of_last_unit(board, -1)
+    def place_right_of_last_unit(self, board):
+        return self.place_x_of_last_unit(board, 1)
+
+    def place_randomly(self, board):
+        return self.place_x(board, randint(0, board._width-1))
+    def place_randomly_right_side(self, board):
+        return self.place_x(board, randint(board._width/2, board._width-1))
+    def place_randomly_left_side(self, board):
+        return self.place_x(board, randint(0, board._width/2-1))
 
 class StaticUnitAgent:
     def __init__(self, actionStates):

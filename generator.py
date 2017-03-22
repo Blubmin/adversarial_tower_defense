@@ -138,18 +138,19 @@ class Generator:
       # if self.gamesPlayed > 100:
       # self._unitAgent = RandomUnitAgent(10, 10, 1000)
 
-      self._unitAgent = StaticUnitAgent([
-         ActionState(0, None, PlaceUnitAction(9), None),
-         ActionState(75, None, PlaceUnitAction(9), None),
-         ActionState(150, None, PlaceUnitAction(9), None),
-         ActionState(225, None, PlaceUnitAction(9), None),
-         ActionState(300, None, PlaceUnitAction(9), None),
-         ActionState(375, None, PlaceUnitAction(9), None),
-         ActionState(450, None, PlaceUnitAction(9), None),
-         ActionState(525, None, PlaceUnitAction(9), None),
-         ActionState(600, None, PlaceUnitAction(9), None),
-         ActionState(675, None, PlaceUnitAction(9), None)
-      ])
+      # self._unitAgent = StaticUnitAgent([
+      #    ActionState(0, None, PlaceUnitAction(9), None),
+      #    ActionState(75, None, PlaceUnitAction(9), None),
+      #    ActionState(150, None, PlaceUnitAction(9), None),
+      #    ActionState(225, None, PlaceUnitAction(9), None),
+      #    ActionState(300, None, PlaceUnitAction(9), None),
+      #    ActionState(375, None, PlaceUnitAction(9), None),
+      #    ActionState(450, None, PlaceUnitAction(9), None),
+      #    ActionState(525, None, PlaceUnitAction(9), None),
+      #    ActionState(600, None, PlaceUnitAction(9), None),
+      #    ActionState(675, None, PlaceUnitAction(9), None)
+      # ])
+      self._unitAgent = UnitAgent(10)
       # self._towerAgent = TowerAgent()
       self._towerAgent = TowerAgent(10)
       self._towerAgent.gamesPlayed = self.gamesPlayed
@@ -157,13 +158,15 @@ class Generator:
    def step(self, stepCount, board):
       boardState = board.getState()
 
-      board.execute(self._unitAgent.step(board, stepCount))
+      # board.execute(self._unitAgent.step(board, stepCount))
       # board.execute(self._towerAgent.step(board, boardState))
+      self._unitAgent.step(board)
       self._towerAgent.step(board)
 
    def gameOver(self, board):
       score = board.getScore()
-      self._unitAgent.gameOver(score)
+      # self._unitAgent.gameOver(score)
+      self._unitAgent.gameOver(board)
       self._towerAgent.gameOver(board)
       # print(savedStates)
       print("Game {0} Finished (score = {1})".format(self.gamesPlayed, score))
