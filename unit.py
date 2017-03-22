@@ -57,9 +57,6 @@ class Unit:
         # Move in direction of next node
         moveX = self._nextNode[0] - self._x
         moveY = self._nextNode[1] - self._y
-        dist = sqrt(pow(moveX, 2) + pow(moveY, 2))
-        # if dist == 0:
-
         if abs(moveX) < self._speed:
             self._x += moveX
         else:
