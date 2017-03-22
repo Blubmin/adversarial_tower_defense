@@ -80,8 +80,7 @@ class App:
     def on_render(self):
         self._screen.fill((0, 0, 0))
         
-        self._board.draw(self._screen)
-
+        # Draw unit paths
         for unit in self._board._units:
             if unit._drawPath or self._debugPath:
                 for node in unit._path:
@@ -89,9 +88,31 @@ class App:
                     nodeY = self._board._offset_y + node[1] * self._board._cell_size
                     rect = pygame.Surface((self._board._cell_size, self._board._cell_size))
                     rect.set_alpha(128)
-                    rect.fill((150,0,0))
+                    rect.fill((180,0,0))
                     self._screen.blit(rect, (nodeX, nodeY))
-                    # pygame.draw.rect(self._screen, (150, 0, 0), (nodeX, nodeY, 32, 32))
+        # Draw unit next node
+        for unit in self._board._units:
+            if unit._drawPath or self._debugPath:
+                if unit._nextNode:
+                    nodeX = self._board._offset_x + unit._nextNode[0] * self._board._cell_size
+                    nodeY = self._board._offset_y + unit._nextNode[1] * self._board._cell_size
+                    rect = pygame.Surface((self._board._cell_size, self._board._cell_size))
+                    rect.set_alpha(128)
+                    rect.fill((0,180,0))
+                    self._screen.blit(rect, (nodeX, nodeY))
+
+        self._board.draw(self._screen)
+
+        # Draw unit paths
+        # for unit in self._board._units:
+        #     if unit._drawPath or self._debugPath:
+        #         for node in unit._path:
+        #             nodeX = self._board._offset_x + node[0] * self._board._cell_size
+        #             nodeY = self._board._offset_y + node[1] * self._board._cell_size
+        #             rect = pygame.Surface((self._board._cell_size, self._board._cell_size))
+        #             rect.set_alpha(128)
+        #             rect.fill((150,0,0))
+        #             self._screen.blit(rect, (nodeX, nodeY))
 
         # xCoord = 10
         # for agent in self._agents:

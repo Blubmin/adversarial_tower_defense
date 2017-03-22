@@ -55,25 +55,32 @@ class Unit:
                     self._path = self._path[1:]
 
         # Move in direction of next node
-        moveX = self._nextNode[0] - self._lastNode[0]
-        moveY = self._nextNode[1] - self._lastNode[1]
-        dist = sqrt(pow(moveX, 2) + pow(moveY, 2))
-        self._x += (moveX / dist) * self._speed
-        self._y += (moveY / dist) * self._speed
+        moveX = self._nextNode[0] - self._x
+        moveY = self._nextNode[1] - self._y
+        if abs(moveX) < self._speed:
+            self._x += moveX
+        else:
+            self._x += self._speed if (self._nextNode[0] > self._x) else -self._speed
+        if abs(moveY) < self._speed:
+            self._y += moveY
+        else:
+            self._y += self._speed if (self._nextNode[1] > self._y) else -self._speed
 
     def isAtNextNode(self, board):
-        if self._direction == NORTH:
-            if self._y <= self._nextNode[1]+0.01:
-                return True
-        elif self._direction == EAST:
-            if self._x >= self._nextNode[0]-0.01:
-                return True
-        elif self._direction == SOUTH:
-            if self._y >= self._nextNode[1]-0.01:
-                return True
-        elif self._direction == WEST:
-            if self._x <= self._nextNode[0]+0.01:
-                return True
+        if abs(self._nextNode[0] - self._x) <= 0.1 and abs(self._nextNode[1] - self._y) <= 0.1:
+            return True
+        # if self._direction == NORTH:
+        #     if self._y <= self._nextNode[1]+0.01:
+        #         return True
+        # elif self._direction == EAST:
+        #     if self._x >= self._nextNode[0]-0.01:
+        #         return True
+        # elif self._direction == SOUTH:
+        #     if self._y >= self._nextNode[1]-0.01:
+        #         return True
+        # elif self._direction == WEST:
+        #     if self._x <= self._nextNode[0]+0.01:
+        #         return True
         return False
 
     def calculateDanger(self, board):

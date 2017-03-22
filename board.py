@@ -127,7 +127,7 @@ class Board:
                 self._score += int(unit._y)
                 self._units.remove(unit)
 
-            elif unit._y > self._height:
+            elif unit._y >= self._height:
                 self._unitsThatReachedGoal += 1
                 self._score += 10
                 unit.setIsAtGoal()
