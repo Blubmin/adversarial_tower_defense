@@ -81,11 +81,11 @@ class Board:
         self._unitsDestroyed = 0
         self._score = 0
 
+    def hasUnit(self, x, y):
+        return reduce(lambda u1, u2: u1 or u2, map(lambda u: int(u._lastNode[0]) == x and int(u._lastNode[1]) == y or u._nextNode and int(u._nextNode[0]) == x and int(u._nextNode[1]) == y, self._units), False)
+
     def isInBounds(self, x, y):
         return 0 <= x < self._width and 0 <= y < self._height
-
-    def hasUnit(self, x, y):
-        return reduce(lambda u1, u2: u1 or u2, map(lambda u: int(u._lastNode[0]) == x and int(u._lastNode[1]) == y or int(u._nextNode[0]) == x and int(u._nextNode[1]) == y, self._units), False)
 
     def hasTower(self, x, y):
         if not self.isInBounds(x, y):
@@ -102,7 +102,7 @@ class Board:
         if self.hasTower(tower._x, tower._y):
             return False
         self._towers[tower._x][tower._y] = tower
-        if not (self.path_exists() and self.unit_path_exists()):
+        if not (self.path_exists()):
             self._towers[tower._x][tower._y] = None
             return False
         self._tower_list += [tower]
@@ -231,7 +231,8 @@ class Board:
 
 
     def unit_path_exists(self):
-        return reduce(lambda u1, u2: u1 and u2, [(len(self.path_from(int(u._x), int(u._y))) is not None) for u in self._units])
+        paths = [(u, self.path_from(int(u._x), int(u._y)), self.path_from(int(u._x), int(u._y)) is not None) for u in self._units]
+        return reduce(lambda u1, u2: (0, u1[1] and u2[1]), paths, (1, True))[1]
 
 
     def path_exists(self):
