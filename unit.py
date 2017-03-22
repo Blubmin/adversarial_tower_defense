@@ -54,15 +54,12 @@ class Unit:
                     self._direction = directionFromNodes(self._lastNode, self._nextNode)
                     self._path = self._path[1:]
 
-        # Move in direction
-        if self._direction == NORTH:
-            self._y -= self._speed
-        elif self._direction == EAST:
-            self._x += self._speed
-        elif self._direction == SOUTH:
-            self._y += self._speed
-        elif self._direction == WEST:
-            self._x -= self._speed
+        # Move in direction of next node
+        moveX = self._nextNode[0] - self._lastNode[0]
+        moveY = self._nextNode[1] - self._lastNode[1]
+        dist = sqrt(pow(moveX, 2) + pow(moveY, 2))
+        self._x += (moveX / dist) * self._speed
+        self._y += (moveY / dist) * self._speed
 
     def isAtNextNode(self, board):
         if self._direction == NORTH:

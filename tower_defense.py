@@ -18,6 +18,7 @@ class App:
         self._gamesPlayed = 0
         self._renderFullGame = False
         self._paused = False
+        self._debugPath = False
 
 
     def on_init(self):
@@ -46,6 +47,9 @@ class App:
                 self._renderFullGame = not self._renderFullGame
             elif event.key == K_p:
                 self._paused = not self._paused
+            elif event.key == K_u:
+                self._debugPath = not self._debugPath
+                self.on_render()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left mouse button
@@ -79,7 +83,7 @@ class App:
         self._board.draw(self._screen)
 
         for unit in self._board._units:
-            if unit._drawPath:
+            if unit._drawPath or self._debugPath:
                 for node in unit._path:
                     nodeX = self._board._offset_x + node[0] * self._board._cell_size
                     nodeY = self._board._offset_y + node[1] * self._board._cell_size
