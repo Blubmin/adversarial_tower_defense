@@ -6,6 +6,7 @@ from unit_agent import RandomUnitAgent
 from tower import Tower
 from tower_agent import TowerAgent
 from generator import Generator
+from mongo_wrapper import MongoWrapper
 
 class App:
     def __init__(self):
@@ -20,6 +21,7 @@ class App:
 
     def on_init(self):
         pygame.init()
+        MongoWrapper().clear_collections()
         self._screen = pygame.display.set_mode((320, 444), pygame.HWSURFACE)
         self._running = True
         self._board = Board(0, 64)

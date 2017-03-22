@@ -3,6 +3,8 @@ from random import randint
 from board import BoardState
 from unit_agent import *
 from actions import *
+from mongo_wrapper import MongoWrapper
+from tower_agent import TowerAgent
 
 def generateNewVector(vectors):
    newVector = []
@@ -82,51 +84,51 @@ class Agent:
 
 
 
-class TowerAgent:
-   def __init__(self):
-      self._actionStates = []
-      self._lastBoardState = None
-
-   def step(self, board, stepCount):
-      state = board.getState()
-      if len(self._actionStates) < 10 and state != self._lastBoardState:
-         self._lastBoardState = state
-         if self.gamesPlayed >= 100:
-            return self.step2(board, stepCount)
-         else:
-            if randint(0, 50) == 0:
-               action = PlaceTowerAction(randint(0, 9), randint(0, 9)) 
-               while board.hasTower(action.x, action.y):
-                  action = PlaceTowerAction(randint(0, 9), randint(0, 9)) 
-               actionState = ActionState(stepCount, state, action, None)
-               self._actionStates.append(actionState)
-               return action
-      return NoAction()
-
-   def step2(self, board, stepCount):
-      state = board.getState()
-      nearestState = GetNearestState(state)
-      dist = state.normalizedDistToState(nearestState.boardState)
-      # print("Dist to nearest state: ", dist)
-      # print("Score of nearest state: ", nearestState.score)
-      if randint(0, 50) == 0:
-         action = PlaceTowerAction(randint(0, 9), randint(0, 9)) 
-         actionState = ActionState(stepCount, state, action, None)
-         self._actionStates.append(actionState)
-         return action
-      else:
-         if not (nearestState.action is NoAction):
-            if board.hasTower(nearestState.action.x, nearestState.action.y):
-               return NoAction()
-            actionState = ActionState(stepCount, state, nearestState.action, None)
-            self._actionStates.append(actionState)
-         return nearestState.action
-
-   def gameOver(self, score):
-      for actionState in self._actionStates:
-         actionState.score = score
-         # TODO: store action states in database
-         SaveState(actionState)
+# class TowerAgent:
+#    def __init__(self):
+#       self._actionStates = []
+#       self._lastBoardState = None
+#
+#    def step(self, board, stepCount):
+#       state = board.getState()
+#       if len(self._actionStates) < 10 and state != self._lastBoardState:
+#          self._lastBoardState = state
+#          if self.gamesPlayed >= 100:
+#             return self.step2(board, stepCount)
+#          else:
+#             if randint(0, 50) == 0:
+#                action = PlaceTowerAction(randint(0, 9), randint(0, 9))
+#                while board.hasTower(action.x, action.y):
+#                   action = PlaceTowerAction(randint(0, 9), randint(0, 9))
+#                actionState = ActionState(stepCount, state, action, None)
+#                self._actionStates.append(actionState)
+#                return action
+#       return NoAction()
+#
+#    def step2(self, board, stepCount):
+#       state = board.getState()
+#       nearestState = GetNearestState(state)
+#       dist = state.normalizedDistToState(nearestState.boardState)
+#       # print("Dist to nearest state: ", dist)
+#       # print("Score of nearest state: ", nearestState.score)
+#       if randint(0, 50) == 0:
+#          action = PlaceTowerAction(randint(0, 9), randint(0, 9))
+#          actionState = ActionState(stepCount, state, action, None)
+#          self._actionStates.append(actionState)
+#          return action
+#       else:
+#          if not (nearestState.action is NoAction):
+#             if board.hasTower(nearestState.action.x, nearestState.action.y):
+#                return NoAction()
+#             actionState = ActionState(stepCount, state, nearestState.action, None)
+#             self._actionStates.append(actionState)
+#          return nearestState.action
+#
+#    def gameOver(self, score):
+#       for actionState in self._actionStates:
+#          actionState.score = score
+#          # TODO: store action states in database
+#          SaveState(actionState)
 
 class Generator:
    def __init__(self):
@@ -135,6 +137,7 @@ class Generator:
    def init(self):
       # if self.gamesPlayed > 100:
       # self._unitAgent = RandomUnitAgent(10, 10, 1000)
+
       self._unitAgent = StaticUnitAgent([
          ActionState(0, None, PlaceUnitAction(9), None),
          ActionState(75, None, PlaceUnitAction(9), None),
@@ -147,19 +150,21 @@ class Generator:
          ActionState(600, None, PlaceUnitAction(9), None),
          ActionState(675, None, PlaceUnitAction(9), None)
       ])
-      self._towerAgent = TowerAgent()
+      # self._towerAgent = TowerAgent()
+      self._towerAgent = TowerAgent(10)
       self._towerAgent.gamesPlayed = self.gamesPlayed
 
    def step(self, stepCount, board):
       boardState = board.getState()
 
       board.execute(self._unitAgent.step(board, stepCount))
-      board.execute(self._towerAgent.step(board, boardState))
+      # board.execute(self._towerAgent.step(board, boardState))
+      self._towerAgent.step(board)
 
    def gameOver(self, board):
       score = board.getScore()
       self._unitAgent.gameOver(score)
-      self._towerAgent.gameOver(score)
+      self._towerAgent.gameOver(board)
       # print(savedStates)
       print("Game {0} Finished (score = {1})".format(self.gamesPlayed, score))
       self.gamesPlayed += 1

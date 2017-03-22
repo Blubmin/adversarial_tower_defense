@@ -67,6 +67,8 @@ class Board:
         self._width = 10
         self._height = 10
         self._towers = [[None for x in range(self._height)] for x in range(self._width)]
+        self._tower_list = []
+        self._num_towers = 0
         self._last_tower = None
         self._units = []
         self._bullets = []
@@ -81,13 +83,17 @@ class Board:
         return self._towers[x][y] != None
 
     def add_tower(self, tower):
+        if not (0 <= tower._x < self._width and 0 <= tower._y < self._height):
+            return False
         if self.hasTower(tower._x, tower._y):
             return False
         self._towers[tower._x][tower._y] = tower
         if not self.path_exists():
             self._towers[tower._x][tower._y] = None
             return False
+        self._tower_list += [tower]
         self._last_tower = tower
+        self._num_towers += 1
         return True
 
     def add_unit(self, unit):
