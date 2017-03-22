@@ -50,8 +50,12 @@ class BoardState:
         for key in self.__dict__:
             if thisTotal > 0:
                 thisVector.append(self.__dict__[key] / thisTotal)
+            else:
+                thisVector.append(0)
             if otherTotal > 0:
                 otherVector.append(boardState.__dict__[key] / otherTotal)
+            else:
+                otherVector.append(0)
         # Get the dist between the normalized states (max distance would be 1)
         dist = 0.0
         for i in range(0, len(thisVector)):
@@ -74,6 +78,7 @@ class Board:
         self._bullets = []
         self._unitsThatReachedGoal = 0
         self._unitsDestroyed = 0
+        self._score = 0
 
     def hasTower(self, x, y):
         if x < 0 or x >= self._width:
@@ -110,10 +115,12 @@ class Board:
         for unit in self._units:
             if unit._shouldDestroy:
                 self._unitsDestroyed += 1
+                self._score += int(unit._y)
                 self._units.remove(unit)
 
             elif unit._y > self._height:
                 self._unitsThatReachedGoal += 1
+                self._score += 10
                 unit.setIsAtGoal()
                 self._units.remove(unit)
 
@@ -150,7 +157,7 @@ class Board:
 
     # The score for the game (used by the generator)
     def getScore(self):
-        return self._unitsDestroyed
+        return self._score
 
     def execute(self, action):
         if action.name == "PlaceUnitAction":
