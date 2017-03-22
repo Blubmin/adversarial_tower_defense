@@ -230,7 +230,7 @@ class Board:
                 and self._offset_y <= y < self._offset_y + self._height * self._cell_size)
 
     def unit_path_exists(self):
-        paths = [self.path_from(int(u._x), int(u._y) is not None) for u in self._units if u._y >= 0]
+        paths = [self.path_from(u._lastNode[0], u._lastNode[1]) is not None for u in self._units if u._y >= 0]
         return reduce(lambda u1, u2: u1 and u2, paths, True)
 
     def path_exists(self):
