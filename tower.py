@@ -16,7 +16,7 @@ class Tower:
     def step(self, board):
         self._shootingDelay -= 1
         for unit in board._units:
-            if board.distance(self, unit) < 5:
+            if board.distance(self, unit) < 3:
                 self.shoot(board, unit)
 
     def shoot(self, board, target):        
