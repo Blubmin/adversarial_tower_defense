@@ -84,7 +84,7 @@ class Board:
     def isInBounds(self, x, y):
         return 0 <= x < self._width and 0 <= y < self._height
 
-    def hasUnit(self, x, y)
+    def hasUnit(self, x, y):
         return reduce(lambda u1, u2: u1 or u2, map(lambda u: int(u._lastNode[0]) == x and int(u._lastNode[1]) == y or int(u._nextNode[0]) == x and int(u._nextNode[1]) == y, self._units), False)
 
     def hasTower(self, x, y):
@@ -102,7 +102,7 @@ class Board:
         if self.hasTower(tower._x, tower._y):
             return False
         self._towers[tower._x][tower._y] = tower
-        if not self.path_exists():
+        if not (self.path_exists() and self.unit_path_exists()):
             self._towers[tower._x][tower._y] = None
             return False
         self._tower_list += [tower]
@@ -228,6 +228,11 @@ class Board:
     def contains_point(self, x, y):
         return (self._offset_x <= x < self._offset_x + self._width * self._cell_size
                 and self._offset_y <= y < self._offset_y + self._height * self._cell_size)
+
+
+    def unit_path_exists(self):
+        return reduce(lambda u1, u2: u1 and u2, [(len(self.path_from(int(u._x), int(u._y))) is not None) for u in self._units])
+
 
     def path_exists(self):
         for x in range(len(self._towers[0])):
