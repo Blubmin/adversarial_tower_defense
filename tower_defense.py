@@ -17,6 +17,7 @@ class App:
         self._generator = Generator()
         self._gamesPlayed = 0
         self._renderFullGame = False
+        self._paused = False
 
 
     def on_init(self):
@@ -43,9 +44,13 @@ class App:
                 self.on_init()
             elif event.key == K_r:
                 self._renderFullGame = not self._renderFullGame
+            elif event.key == K_p:
+                self._paused = not self._paused
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left mouse button
+                pass
+            if event.button == 3: # Right mouse button
                 x, y = pygame.mouse.get_pos()
                 if not self._board.contains_point(x, y):
                     return
@@ -87,16 +92,17 @@ class App:
             start = pygame.time.get_ticks()
             for event in pygame.event.get():
                 self.on_event(event)
-            if self._steps < 1000:
-                self.on_loop()
-                if self._renderFullGame:
+            if not self._paused:
+                if self._steps < 1000:
+                    self.on_loop()
+                    if self._renderFullGame:
+                        self.on_render()
+                elif self._steps >= 1000:
                     self.on_render()
-            elif self._steps >= 1000:
-                self.on_render()
-                self._gamesPlayed += 1
-                self._generator.gameOver(self._board)
-                self.on_init()
-            self._steps += 1
+                    self._gamesPlayed += 1
+                    self._generator.gameOver(self._board)
+                    self.on_init()
+                self._steps += 1
         self.on_cleanup()
 
 
