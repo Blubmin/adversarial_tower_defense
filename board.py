@@ -1,6 +1,7 @@
 import pygame
 import math
 
+from functools import reduce
 from tower import Tower
 from unit import Unit
 
@@ -80,6 +81,9 @@ class Board:
         self._unitsDestroyed = 0
         self._score = 0
 
+    def hasUnit(self, x, y):
+        return reduce(lambda u1, u2: u1 and u2, map(lambda u: int(u._x) == x and int(u._y) == y, self._units))
+
     def hasTower(self, x, y):
         if x < 0 or x >= self._width:
             return False
@@ -88,6 +92,8 @@ class Board:
         return self._towers[x][y] != None
 
     def add_tower(self, tower):
+        if self.hasUnit(tower._x, tower._y):
+            return False
         if not (0 <= tower._x < self._width and 0 <= tower._y < self._height):
             return False
         if self.hasTower(tower._x, tower._y):
