@@ -78,75 +78,112 @@ class UnitAgent:
     def place_randomly_left_side(self, board):
         return self.place_x(board, randint(0, board._width/2-1))
 
-class StaticUnitAgent:
-    def __init__(self, actionStates):
-        self._actionStates = actionStates
-        self._nextStateIndex = 0
+class StaticUnitAgent(UnitAgent):
+    def __init__(self, actions_taken, maxUnits):
+        super().__init__(maxUnits)
+        self._actions_taken = actions_taken
 
-    def step(self, board, stepCount):
-        # If there is still a state that needs to be executed
-        if self._nextStateIndex < len(self._actionStates):
-            nextState = self._actionStates[self._nextStateIndex]
-            # If the state should be executed
-            if self._actionStates[self._nextStateIndex].stepCount <= stepCount:
-                self._nextStateIndex += 1
-                # Execute the action associated with the state
-                return nextState.action
-        return NoAction()
-
-    def gameOver(self, score):
+    def init(self):
         pass
 
-class RandomUnitAgent:
-    def __init__(self, boardWidth, maxUnits, maxSteps):
-        self._actionStates = []
-        self._placementTriggers = []
-        self._maxUnits = maxUnits
-        # Generate random states for when to place units
-        for i in range(0, self._maxUnits):
-            time = randint(0, maxSteps-300)
-            posX = randint(0, boardWidth-1)
-            self._placementTriggers.append((time, posX))
-        self._placementTriggers = sorted(self._placementTriggers, key=lambda student: student[0])
+    def step(self, board):
+        if board._num_units >= 10:
+            return None
+        for action_taken in self._actions_taken:
+            if board.getState().normalizedDistToState(action_taken[0]) < 0.5:
+                return action_taken[1]
 
-    def step(self, board, stepCount):
-        # If maximum number of units has not been reached
-        unitsPlaced = len(self._actionStates)
-        if unitsPlaced < self._maxUnits:
-            # If the step is less than the next placement trigger, place a unit
-            if self._placementTriggers[unitsPlaced][0] <= stepCount:
-                action = PlaceUnitAction(self._placementTriggers[unitsPlaced][1])
-                actionState = ActionState(stepCount, board.getState(), action, None)
-                self._actionStates.append(actionState)
-                return action
-        return NoAction()
+    def gameOver(self, board):
+        pass
 
-    def gameOver(self, score):
-        for actionState in self._actionStates:
-            actionState.score = score
-            # SaveState(actionState)
+    def place_x(self, board, x):
+        return super().place_x(board, x)
+    def place_x_of_last_unit(self, board, x):
+        return super().place_x_of_last_unit(board, x)
+
+    def place_same_as_last_unit(self, board):
+        return super().place_same_as_last_unit(board)
+    def place_left_of_last_unit(self, board):
+        return super().place_left_of_last_unit(board)
+    def place_right_of_last_unit(self, board):
+        return super().place_right_of_last_unit(board)
+
+    def place_randomly(self, board):
+        return super().place_randomly(board)
+    def place_randomly_right_side(self, board):
+        return super().place_randomly_right_side(board)
+    def place_randomly_left_side(self, board):
+        return super().place_randomly_left_side(board)
+
+# class StaticUnitAgent:
+#     def __init__(self, actionStates):
+#         self._actionStates = actionStates
+#         self._nextStateIndex = 0
+
+#     def step(self, board, stepCount):
+#         # If there is still a state that needs to be executed
+#         if self._nextStateIndex < len(self._actionStates):
+#             nextState = self._actionStates[self._nextStateIndex]
+#             # If the state should be executed
+#             if self._actionStates[self._nextStateIndex].stepCount <= stepCount:
+#                 self._nextStateIndex += 1
+#                 # Execute the action associated with the state
+#                 return nextState.action
+#         return NoAction()
+
+#     def gameOver(self, score):
+#         pass
+
+# class RandomUnitAgent:
+#     def __init__(self, boardWidth, maxUnits, maxSteps):
+#         self._actionStates = []
+#         self._placementTriggers = []
+#         self._maxUnits = maxUnits
+#         # Generate random states for when to place units
+#         for i in range(0, self._maxUnits):
+#             time = randint(0, maxSteps-300)
+#             posX = randint(0, boardWidth-1)
+#             self._placementTriggers.append((time, posX))
+#         self._placementTriggers = sorted(self._placementTriggers, key=lambda student: student[0])
+
+#     def step(self, board, stepCount):
+#         # If maximum number of units has not been reached
+#         unitsPlaced = len(self._actionStates)
+#         if unitsPlaced < self._maxUnits:
+#             # If the step is less than the next placement trigger, place a unit
+#             if self._placementTriggers[unitsPlaced][0] <= stepCount:
+#                 action = PlaceUnitAction(self._placementTriggers[unitsPlaced][1])
+#                 actionState = ActionState(stepCount, board.getState(), action, None)
+#                 self._actionStates.append(actionState)
+#                 return action
+#         return NoAction()
+
+#     def gameOver(self, score):
+#         for actionState in self._actionStates:
+#             actionState.score = score
+#             # SaveState(actionState)
 
 
-class SmartUnitAgent:
-    def __init__(self, board, maxUnits, maxSteps):
-        self._actionStates = []
-        self._maxUnits = maxUnits
+# class SmartUnitAgent:
+#     def __init__(self, board, maxUnits, maxSteps):
+#         self._actionStates = []
+#         self._maxUnits = maxUnits
 
-    def step(self, board, stepCount):
-        # If maximum number of units has not been reached
-        unitsPlaced = len(self._actionStates)
-        if unitsPlaced < self._maxUnits:
-            # If the step is less than the next placement trigger, place a unit
-            if self._placementTriggers[unitsPlaced][0] <= stepCount:
-                action = PlaceUnitAction(self._placementTriggers[unitsPlaced][1])
-                actionState = ActionState(stepCount, board.getState(), action, None)
-                self._actionStates.append(actionState)
-        return NoAction()
+#     def step(self, board, stepCount):
+#         # If maximum number of units has not been reached
+#         unitsPlaced = len(self._actionStates)
+#         if unitsPlaced < self._maxUnits:
+#             # If the step is less than the next placement trigger, place a unit
+#             if self._placementTriggers[unitsPlaced][0] <= stepCount:
+#                 action = PlaceUnitAction(self._placementTriggers[unitsPlaced][1])
+#                 actionState = ActionState(stepCount, board.getState(), action, None)
+#                 self._actionStates.append(actionState)
+#         return NoAction()
 
-    def gameOver(self, score):
-        for actionState in self._actionStates:
-            actionState.score = score
-            SaveState(actionState)
+#     def gameOver(self, score):
+#         for actionState in self._actionStates:
+#             actionState.score = score
+#             SaveState(actionState)
 
 
 

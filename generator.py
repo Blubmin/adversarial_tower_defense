@@ -6,26 +6,16 @@ from actions import *
 from mongo_wrapper import MongoWrapper
 from tower_agent import TowerAgent
 
-def generateNewVector(vectors):
-   newVector = []
-   for i in range(0, len(vectors[0])):
-      vector3.append(randint(0, len(vectors)))
+# def generateNewVector(vectors):
+#    newVector = []
+#    for i in range(0, len(vectors[0])):
+#       vector3.append(randint(0, len(vectors)))
 
-def mutateVector(vector, mutationChance):
-   newVector = []
-   for i in range(0, len(vector)):
-      if randint(0, 1/mutationChance) == 0:
-         vector[i]
-
-# class StaticUnitAgent:
-# class StaticTowerAgent:
-
-class Agent:
-   def __init__(self, database):
-      self.states = [] # (board state, tower placement region, score)
-
-   def step(self, state):
-      pass
+# def mutateVector(vector, mutationChance):
+#    newVector = []
+#    for i in range(0, len(vector)):
+#       if randint(0, 1/mutationChance) == 0:
+#          vector[i]
 
 # Unit State:
    # #units in region 1
@@ -58,11 +48,6 @@ class Agent:
          # else random chance (1 out of 100) to place tower anyway
          # When placing tower, use stored location + random variance (up to 2 blocks away)
 
-   def gameOver(self, heuristic):
-      for state in self.states:
-         # store state in database with the heuristic score
-         pass
-
 
 # For training
    # init StaticUnitAgent
@@ -74,9 +59,6 @@ class Agent:
       # get action from agents
       # perform action
    # After 1000 steps, call gameover method on both agents
-
-
-
 
 
 
@@ -132,12 +114,15 @@ class Agent:
 
 class Generator:
    def __init__(self):
-      self.gamesPlayed = 0
+      self._unit_agent = UnitAgent(10)
+      self._tower_agent = TowerAgent(10)
+      self._random_training_games = 0
+      self._normal_training_games = 0
+      self._random_training = True
+      self._normal_training = False
+      self._generations = 0
 
    def init(self):
-      # if self.gamesPlayed > 100:
-      # self._unitAgent = RandomUnitAgent(10, 10, 1000)
-
       # self._unitAgent = StaticUnitAgent([
       #    ActionState(0, None, PlaceUnitAction(9), None),
       #    ActionState(75, None, PlaceUnitAction(9), None),
@@ -151,26 +136,39 @@ class Generator:
       #    ActionState(675, None, PlaceUnitAction(9), None)
       # ])
       self._unitAgent = UnitAgent(10)
-      # self._towerAgent = TowerAgent()
       self._towerAgent = TowerAgent(10)
-      self._towerAgent.gamesPlayed = self.gamesPlayed
 
-   def step(self, stepCount, board):
-      boardState = board.getState()
-
-      # board.execute(self._unitAgent.step(board, stepCount))
-      # board.execute(self._towerAgent.step(board, boardState))
+   def step(self, board):
       self._unitAgent.step(board)
       self._towerAgent.step(board)
 
    def gameOver(self, board):
-      score = board.getScore()
-      # self._unitAgent.gameOver(score)
       self._unitAgent.gameOver(board)
       self._towerAgent.gameOver(board)
-      # print(savedStates)
-      print("Game {0} Finished (score = {1})".format(self.gamesPlayed, score))
-      self.gamesPlayed += 1
+
+      # print("Game {0} Finished (score = {1})".format(self.gamesPlayed, score))
+      self.updateState()
+
+   def updateState(self):
+      if self._random_training:
+         self._random_training_games += 1
+
+         if self._random_training_games >= 100:
+            self._random_training = False
+            self._normal_training = True
+            print("Begin Turn-Based Training")
+            print("Generation 0")
+            # Change one agent to a static agent
+            # TODO: ^^^
+      elif self._normal_training:
+         self._normal_training_games += 1
+
+         if self._normal_training_games >= 100:
+            self._normal_training_games = 0
+            self._generations += 1
+            print("Generation", self._generations)
+            # Swap static agent
+            # TODO: ^^^
 
 
 
