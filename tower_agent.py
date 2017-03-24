@@ -73,24 +73,26 @@ class TowerAgent:
 
     def gameOver(self, board):
         if self._actions_taken:
-            tower_data = map( lambda x: {"state": x[0].__dict__, "action": x[1], "score": board._unitsDestroyed} ,self._actions_taken)
-            MongoWrapper().save_tower_data(tower_data)
+            tower_data = list(filter(lambda x: x["body_count"] > 0, map( lambda x: {"state": x[0].__dict__, "action": x[1], "score": board.getScore(), "body_count": x[2]._body_count} ,self._actions_taken)))
+            if len(tower_data) > 0:
+                MongoWrapper().save_tower_data(tower_data)
 
     def placeTower(self, board):
         if board._num_towers >= 10:
             return None
 
+        # action = self.play_randomly(board)
         action = self.get_action(board)
         if action is None:
             return
-        self._actions_taken += [(TowerState(board), action)]  # Keeps track of actions taken in this game
+        self._actions_taken += [(TowerState(board), action, board._last_tower)]  # Keeps track of actions taken in this game
 
     def get_action(self, board):
         tower_data = MongoWrapper().get_tower_data()
         if tower_data.count() is not 0:
             self.calc_zscores(board)
 
-        if self._state_actions is None or len(self._state_actions) < 1000 or randrange(0, 50) is 1:
+        if self._state_actions is None or len(self._state_actions) < 500 or randrange(0, 50) is 1:
             return self.play_randomly(board)
         return self.play_intelligently(board)
 
@@ -105,6 +107,8 @@ class TowerAgent:
 
         top = [self._state_actions[t[1]] for t in top]
         top.sort(key=lambda key: key[1])
+        top = top[:10]
+        top.sort(key=lambda key: key[2])
 
         for a in top:
             if getattr(self, a[2])(board):
@@ -145,7 +149,7 @@ class TowerAgent:
         if len(tower_data) is 0:
             return
 
-        self._state_actions = [[[], -1, ""] for x in range(len(tower_data))]
+        self._state_actions = [[[], -1, "", -1] for x in range(len(tower_data))]
 
         for key in state.__dict__:
             zscores, mu, sd = zscore_array([d["state"][key] for d in tower_data])
@@ -158,6 +162,7 @@ class TowerAgent:
         for i in range(len(tower_data)):
             self._state_actions[i][1] = tower_data[i]["score"]
             self._state_actions[i][2] = tower_data[i]["action"]
+            self._state_actions[i][3] = tower_data[i]["body_count"]
 
     def render(self, screen, xCoord, yCoord):
         myfont = pygame.font.SysFont("monospace", 15)
@@ -182,8 +187,8 @@ class TowerAgent:
     def place_down_of_last_tower(self, board):
         return self.place_x_y_of_last_tower(board, 0, -1)
 
-    def place_randomly(self, board):
-        tower = Tower(randrange(0, board._width), randrange(0, board._height))
+    def place_randomly_in_range(self, board, x_min, x_max, y_min, y_max):
+        tower = Tower(randrange(x_min, x_max), randrange(y_min, y_max))
 
         count = board._num_towers
         while not board.add_tower(tower):
@@ -191,6 +196,21 @@ class TowerAgent:
             tower = Tower(randrange(0, board._width), randrange(0, board._height))
         assert count + 1 == board._num_towers, "place along path True error"
         return True
+
+    def place_randomly(self, board):
+        return self.place_randomly_in_range(board, 0, board._width, 0, board._height)
+
+    def place_top_left(self, board):
+        return self.place_randomly_in_range(board, 0, board._width / 2, 0, board._height / 2)
+
+    def place_bottom_left(self, board):
+        return self.place_randomly_in_range(board, 0, board._width / 2, board._height / 2, board._height)
+
+    def place_bottom_right(self, board):
+        return self.place_randomly_in_range(board, board._width / 2, board._width, board._height / 2, board._height)
+
+    def place_top_right(self, board):
+        return self.place_randomly_in_range(board, board._width / 2, board._width, 0, board._height / 2)
 
     def place_along_path(self, board):
         if len(board._units) is 0:

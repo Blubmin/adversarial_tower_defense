@@ -156,7 +156,7 @@ class Unit:
 
 def astar(unit, board):
     # Calculate danger
-    # unit.calculateDanger(board)
+    unit.calculateDanger(board)
     # unit.calculateSafety(board)
     # unit.printDangerMap(board)
     # unit.printSafetyMap(board)

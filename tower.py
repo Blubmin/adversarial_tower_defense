@@ -12,6 +12,7 @@ class Tower:
         self._y = y
         self._shootingDelay = 0
         self._timeOfLastShot = 0
+        self._body_count = 0
 
     def step(self, board):
         self._shootingDelay -= 1
@@ -25,4 +26,4 @@ class Tower:
             dist = board.distance(self, target)
             dx = (target._x - self._x) / dist / 3
             dy = (target._y - self._y) / dist / 3
-            board.add_bullet(Bullet(self._x, self._y, dx, dy))
+            board.add_bullet(Bullet(self, self._x, self._y, dx, dy))

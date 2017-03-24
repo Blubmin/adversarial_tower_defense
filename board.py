@@ -164,6 +164,7 @@ class Board:
                 for unit in self._units:
                     if self.has_collision(bullet, unit):
                         unit.damage(50)
+                        bullet._parent._body_count += 1
                         bullet.setShouldDestroy()
                         break
 
