@@ -15,7 +15,7 @@ class MongoWrapper:
 
     def clear_collections(self):
         try:
-            self._db.tower.delete({})
+            self._db.tower.delete_many({})
         finally:
             return None
 

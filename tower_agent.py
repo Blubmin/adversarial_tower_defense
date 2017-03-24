@@ -4,8 +4,10 @@ from functools import reduce
 from operator import iadd
 from random import randrange
 from random import choice
-from tower import Tower
+
 from mongo_wrapper import MongoWrapper
+from tower import Tower
+from zscore import *
 
 class TowerState:
     def __init__(self, board):
@@ -17,9 +19,28 @@ class TowerState:
         self.towersInLowerRight = reduce(iadd, map(lambda t: 1 if t._x >= 5 and t._y >= 5 else 0, board._tower_list), 0)
         self.unitsOnLeftSide = reduce(iadd, map(lambda t: 1 if t._x < 5 else 0, board._units), 0)
         self.unitsOnRightSide  = reduce(iadd, map(lambda t: 1 if t._x >= 5 else 0, board._units), 0)
+        self.tick = board._tick
 
-    def dist(self, other):
-        return None
+    def top_k(self, k):
+        tower_data = MongoWrapper().get_tower_data()
+        if tower_data is None:
+            return [0]
+        tower_data = [d for d in tower_data]
+        zscores = []
+        items = [[] for x in range(len(tower_data))]
+        for key in self.__dict__:
+            data = [d["state"][key] for d in tower_data]
+            a = data + [self.__dict__[key]]
+            zscores += [stats.zscore(numpy.array(a))]
+        for i in range(len(tower_data)):
+            for z in zscores:
+                items[i] += [z[i]]
+        z = items[-1]
+        distances = [ -1 for x in range(len(tower_data))]
+
+
+
+        return items[-1:]
 
 class TowerAgent:
     def __init__(self, maxUnits):
@@ -33,6 +54,11 @@ class TowerAgent:
                          "place_along_path"]
         self._actions_taken = []
 
+        # For manually calculating zscores
+        self._state_actions = None
+        self._means = None
+        self._sds = None
+
     def init(self, board):
         self._towers = []
         self._score = 0
@@ -43,8 +69,7 @@ class TowerAgent:
             # board.add_tower(tower)
 
     def step(self, board):
-        rand = randrange(0, 100)
-        return (self.placeTower(board) if rand is 1 else None)
+        return self.placeTower(board)
 
     def gameOver(self, board):
         tower_data = map( lambda x: {"state": x[0].__dict__, "action": x[1], "score": board._unitsDestroyed} ,self._actions_taken)
@@ -53,21 +78,85 @@ class TowerAgent:
     def placeTower(self, board):
         if board._num_towers >= 10:
             return None
-        tower_data = MongoWrapper().get_tower_data()
-        # for data in tower_data:
-        #     print(data)
 
-        count = board._num_towers
+        action = self.get_action(board)
+        if action is None:
+            return
+        self._actions_taken += [(TowerState(board), action)]  # Keeps track of actions taken in this game
+
+    def get_action(self, board):
+        tower_data = MongoWrapper().get_tower_data()
+        if tower_data.count() is not 0:
+            self.calc_zscores(board)
+
+        if self._state_actions is None or len(self._state_actions) < 1000 or randrange(0, 50) is 1:
+            return self.play_randomly(board)
+        return self.play_intelligently(board)
+
+    def play_intelligently(self, board):
+        state = TowerState(board)
+
+        state_z = []
+        for key in state.__dict__:
+            state_z += [zscore(state.__dict__[key], self._means[key], self._sds[key])]
+
+        top = self.top_k(state_z, 100)
+
+        top = [self._state_actions[t[1]] for t in top]
+        top.sort(key=lambda key: key[1])
+
+        for a in top:
+            if getattr(self, a[2])(board):
+                return a[2]
+        return self.play_randomly(board)
+
+    def play_randomly(self, board):
+        action = ""
         if board._last_tower is None:
             action = "place_randomly"
         else:
-            action = choice(self._actions) # Picks a random action
-        while not getattr(self, action)(board): # Performs the action
-            assert board._num_towers == count, "{}: actual {} expected {}".format(action, board._num_towers, count)
+            action = choice(self._actions)  # Picks a random action
+        while not getattr(self, action)(board):  # Performs the action
             action = choice(self._actions)
-        self._actions_taken += [(TowerState(board), action)] # Keeps track of actions taken in this game
-        assert board._num_towers == count + 1, "{}: actual {} expected {}".format(action, board._num_towers, count + 1)
         return action
+
+    def top_k(self, zs, k):
+        ds = []
+        for i in range(len(self._state_actions)):
+            ds += [(self.dist(zs, self._state_actions[i][0]), i)]
+        return sorted(ds, key=lambda key: key[0])[:k]
+
+    def dist(self, a, b):
+        d = 0
+        for i in range(len(a)):
+            d += (a[i] - b[i])**2
+        return d
+
+    def calc_zscores(self, board):
+        self._means = {}
+        self._sds = {}
+
+        state = TowerState(board)
+
+        tower_data = MongoWrapper().get_tower_data()
+        tower_data = [d for d in tower_data]
+
+        if len(tower_data) is 0:
+            return
+
+        self._state_actions = [[[], -1, ""] for x in range(len(tower_data))]
+
+        for key in state.__dict__:
+            zscores, mu, sd = zscore_array([d["state"][key] for d in tower_data])
+            self._means[key] = mu
+            self._sds[key] = sd
+
+            for i in range(len(zscores)):
+                self._state_actions[i][0].append(zscores[i])
+
+        for i in range(len(tower_data)):
+            self._state_actions[i][1] = tower_data[i]["score"]
+            self._state_actions[i][2] = tower_data[i]["action"]
 
     def render(self, screen, xCoord, yCoord):
         myfont = pygame.font.SysFont("monospace", 15)

@@ -80,6 +80,7 @@ class Board:
         self._unitsThatReachedGoal = 0
         self._unitsDestroyed = 0
         self._score = 0
+        self._tick = 0
 
     def hasUnit(self, x, y):
         return reduce(lambda u1, u2: u1 or u2, map(lambda u: int(u._lastNode[0]) == x and int(u._lastNode[1]) == y or u._nextNode and int(u._nextNode[0]) == x and int(u._nextNode[1]) == y, self._units), False)
@@ -117,6 +118,8 @@ class Board:
         self._bullets.append(bullet)
 
     def step(self):
+        self._tick += 1
+
         for unit in self._units:
             unit.step(self)
 
