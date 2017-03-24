@@ -47,8 +47,9 @@ class TowerAgent:
         return (self.placeTower(board) if rand is 1 else None)
 
     def gameOver(self, board):
-        tower_data = map( lambda x: {"state": x[0].__dict__, "action": x[1], "score": board._unitsDestroyed} ,self._actions_taken)
-        MongoWrapper().save_tower_data(tower_data)
+        if self._actions_taken:
+            tower_data = map( lambda x: {"state": x[0].__dict__, "action": x[1], "score": board._unitsDestroyed} ,self._actions_taken)
+            MongoWrapper().save_tower_data(tower_data)
 
     def placeTower(self, board):
         if board._num_towers >= 10:

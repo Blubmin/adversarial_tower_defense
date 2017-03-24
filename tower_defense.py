@@ -69,7 +69,7 @@ class App:
                 self.on_render()
 
     def on_loop(self):
-        self._generator.step(self._board)
+        self._generator.step(self._board, self._steps)
         self._board.step()
 
     def on_render(self):
@@ -125,7 +125,7 @@ class App:
             if not self._paused:
                 if len(self._board._units) == 0 and self._board._num_units == 10:
                     self.on_game_over()
-                if self._steps < 1000:
+                if self._steps < 2000:
                     self.on_loop()
                     if self._renderFullGame:
                         self.on_render()

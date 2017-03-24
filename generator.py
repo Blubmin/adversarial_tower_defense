@@ -135,11 +135,11 @@ class Generator:
       #    ActionState(600, None, PlaceUnitAction(9), None),
       #    ActionState(675, None, PlaceUnitAction(9), None)
       # ])
-      self._unitAgent = UnitAgent(10)
+      self._unitAgent = RandomUnitAgent(10)
       self._towerAgent = TowerAgent(10)
 
-   def step(self, board):
-      self._unitAgent.step(board)
+   def step(self, board, steps):
+      self._unitAgent.step(board, steps)
       self._towerAgent.step(board)
 
    def gameOver(self, board):
@@ -160,6 +160,7 @@ class Generator:
             print("Generation 0")
             # Change one agent to a static agent
             # TODO: ^^^
+            self._unitAgent = UnitAgent(10)
       elif self._normal_training:
          self._normal_training_games += 1
 
