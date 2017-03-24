@@ -27,19 +27,23 @@ class Unit:
         self._towers = []
         self._path = []
         self._drawPath = False
+        self._damage = 0
 
         if self._unit_type == 0:
             self._image = pygame.image.load("unit.png").convert_alpha()
             self._speed = 0.05
             self._health = 200
+            self._max_health = 200
         elif self._unit_type == 1:
             self._image = pygame.image.load("unit_heavy.png").convert_alpha()
             self._speed = 0.025
             self._health = 400
+            self._max_health = 400
         else:
             self._image = pygame.image.load("unit_light.png").convert_alpha()
             self._speed = 0.075
             self._health = 100
+            self._max_health = 100
 
     def setShouldDestroy(self):
         self._shouldDestroy = True
@@ -49,6 +53,7 @@ class Unit:
 
     def damage(self, damage):
         self._health -= damage
+        self._damage += damage
         if self._health <= 0:
             self._shouldDestroy = True
 
@@ -156,7 +161,7 @@ class Unit:
 
 def astar(unit, board):
     # Calculate danger
-    unit.calculateDanger(board)
+    # unit.calculateDanger(board)
     # unit.calculateSafety(board)
     # unit.printDangerMap(board)
     # unit.printSafetyMap(board)

@@ -114,8 +114,8 @@ from tower_agent import TowerAgent
 
 class Generator:
    def __init__(self):
-      self._unit_agent = UnitAgent(10)
-      self._tower_agent = TowerAgent(10)
+      self._unitAgent = RandomUnitAgent(10)
+      self._towerAgent = TowerAgent(10)
       self._random_training_games = 0
       self._normal_training_games = 0
       self._random_training = True
@@ -135,7 +135,10 @@ class Generator:
       #    ActionState(600, None, PlaceUnitAction(9), None),
       #    ActionState(675, None, PlaceUnitAction(9), None)
       # ])
-      self._unitAgent = RandomUnitAgent(10)
+      if self._random_training:
+         self._unitAgent = RandomUnitAgent(10)
+      else:
+         self._unitAgent = UnitAgent(10)
       self._towerAgent = TowerAgent(10)
 
    def step(self, board, steps):
@@ -160,7 +163,6 @@ class Generator:
             print("Generation 0")
             # Change one agent to a static agent
             # TODO: ^^^
-            self._unitAgent = UnitAgent(10)
       elif self._normal_training:
          self._normal_training_games += 1
 

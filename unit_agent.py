@@ -14,6 +14,8 @@ from mongo_wrapper import MongoWrapper
 # place random left side
 # place heavy and slow ditto
 # place fast and light ditto
+# 
+# place in lane farthest from lanes with towers
 
 def kNearestNeighbors(states, boardState, k):
    # Sort states based on distance
@@ -27,9 +29,11 @@ class UnitAgent:
         self._actions = ["place_randomly",
                          "place_randomly_right_side",
                          "place_randomly_left_side",
+                         "place_randomly_middle",
                          "place_same_as_last_unit",
                          "place_left_of_last_unit",
-                         "place_right_of_last_unit"] # Same methods but with heavy and light units
+                         "place_right_of_last_unit",
+                         "place_in_safest_lane"] # Same methods but with heavy and light units
         self._actions_taken = []
 
     def init(self, board):
@@ -46,16 +50,18 @@ class UnitAgent:
 
         boardState = board.getState()
         unit_data = [x for x in MongoWrapper().get_unit_data()]
-        print(len(unit_data))
+        # print(len(unit_data))
 
         # Get the k nearest states, sorted by score (ascending)
-        nearestStates = kNearestNeighbors(unit_data, boardState, 10)
-        # Get the best scoring state
-        bestState = nearestStates[len(nearestStates)-1]
+        nearestStates = kNearestNeighbors(unit_data, boardState, 100)
+        # Get the 10 best scoring states, sorted by unit damage (ascending)
+        highscoreStates = sorted(nearestStates[len(nearestStates)-10:], key=lambda state: state["unit_damage"])
+        # Get the best scoring state (lowest unit damage)
+        bestState = highscoreStates[0]
 
-        print(boardState.__dict__)
-        print(bestState)
-        print()
+        # print(boardState.__dict__)
+        # print(bestState)
+        # print()
 
         if board._last_unit is None:
             action = "place_randomly"
@@ -66,12 +72,13 @@ class UnitAgent:
 
         if not getattr(self, action)(board, unit_type): # Performs the action
             return None
-        self._actions_taken += [(boardState, action, unit_type)] # Keeps track of actions taken in this game
+        self._actions_taken += [(boardState, action, unit_type, board._last_unit)] # Keeps track of actions taken in this game
         return action
 
     def gameOver(self, board):
-        unit_data = map( lambda x: {"state": x[0].__dict__, "action": x[1], "unit_type": x[2], "score": board.getScore()}, self._actions_taken)
-        MongoWrapper().save_unit_data(unit_data)
+        unit_data = list(filter(lambda x: x["reached_goal"] == True, map( lambda x: {"state": x[0].__dict__, "action": x[1], "unit_type": x[2], "unit_damage": x[3]._damage, "reached_goal": x[3]._isAtGoal, "score": board.getScore()}, self._actions_taken)))
+        if unit_data:
+            MongoWrapper().save_unit_data(unit_data)
 
     def place_x(self, board, unit_type, x):
         unit = Unit(x, -1, unit_type)
@@ -80,7 +87,10 @@ class UnitAgent:
         if board._last_unit is None:
             return False
         unit = Unit(board._last_unit_initial_location[0] + x, -1, unit_type)
-        return board.add_unit(unit)
+        if board.add_unit(unit) == False:
+            unit = Unit(board._last_unit_initial_location[0], -1, unit_type)
+            board.add_unit(unit)
+        return True
 
     def place_same_as_last_unit(self, board, unit_type):
         return self.place_x_of_last_unit(board, unit_type, 0)
@@ -92,9 +102,43 @@ class UnitAgent:
     def place_randomly(self, board, unit_type):
         return self.place_x(board, unit_type, randint(0, board._width-1))
     def place_randomly_right_side(self, board, unit_type):
-        return self.place_x(board, unit_type, randint(board._width/2, board._width-1))
+        return self.place_x(board, unit_type, randint(int(board._width*2/3)+1, board._width-1))
     def place_randomly_left_side(self, board, unit_type):
-        return self.place_x(board, unit_type, randint(0, board._width/2-1))
+        return self.place_x(board, unit_type, randint(0, int(board._width/3)-1))
+    def place_randomly_middle(self, board, unit_type):
+        return self.place_x(board, unit_type, randint(int(board._width/3), int(board._width*2/3)))
+
+    def place_in_safest_lane(self, board, unit_type):
+        laneTowerCounts = [len([tower for tower in board._tower_list if tower._x == x]) for x in range(0, board._width)]
+        # print(laneTowerCounts)
+        maxSafety = [0 for i in range(0, 10)]
+        for x in range(0, board._width):
+            if laneTowerCounts[x] != 0:
+                continue
+            leftSafeLanes = 0
+            for x2 in range(x-1, -1, -1):
+                if laneTowerCounts[x2] == 0:
+                    leftSafeLanes += 1
+                else:
+                    break;
+            rightSafeLanes = 0
+            for x2 in range(x+1, board._width):
+                if laneTowerCounts[x2] == 0:
+                    rightSafeLanes += 1
+                else:
+                    break;
+            if leftSafeLanes == x:
+                maxSafety[x] = rightSafeLanes
+            elif rightSafeLanes == board._width-x-1:
+                maxSafety[x] = leftSafeLanes
+            else:
+                maxSafety[x] = min(leftSafeLanes, rightSafeLanes)
+        # print(maxSafety)
+        safeLaneMax = max(maxSafety)
+        for x in range(0, board._width):
+            if maxSafety[x] == safeLaneMax:
+                # print("Lane", x, "is the safest")
+                return self.place_x(board, unit_type, x)
 
 class RandomUnitAgent(UnitAgent):
     def __init__(self, maxUnits):
@@ -114,7 +158,7 @@ class RandomUnitAgent(UnitAgent):
 
         while not getattr(self, action)(board, unit_type): # Performs the action
             action = choice(self._actions)
-        self._actions_taken += [(board.getState(), action, unit_type)] # Keeps track of actions taken in this game
+        self._actions_taken += [(board.getState(), action, unit_type, board._last_unit)] # Keeps track of actions taken in this game
         return action
 
 class StaticUnitAgent(UnitAgent):
