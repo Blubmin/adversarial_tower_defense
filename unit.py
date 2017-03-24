@@ -8,16 +8,18 @@ SOUTH = 2
 WEST = 3
 STOP = 4
 
+NORMAL = 0
+HEAVY = 1
+LIGHT = 2
+
 class Unit:
-    def __init__(self, x, y):
-        self._image = pygame.image.load("unit.png").convert_alpha()
+    def __init__(self, x, y, unit_type):
         self._x = x
         self._y = y
-        self._speed = 0.05
+        self._unit_type = unit_type
         self._direction = None
         self._lastNode = (x, y)
         self._nextNode = None
-        self._health = 300
         self._shouldDestroy = False
         self._isAtGoal = False
         self._dangerMap = [[0 for x in range(10)] for x in range(11)]
@@ -25,6 +27,19 @@ class Unit:
         self._towers = []
         self._path = []
         self._drawPath = False
+
+        if self._unit_type == 0:
+            self._image = pygame.image.load("unit.png").convert_alpha()
+            self._speed = 0.05
+            self._health = 200
+        elif self._unit_type == 1:
+            self._image = pygame.image.load("unit_heavy.png").convert_alpha()
+            self._speed = 0.025
+            self._health = 400
+        else:
+            self._image = pygame.image.load("unit_light.png").convert_alpha()
+            self._speed = 0.075
+            self._health = 100
 
     def setShouldDestroy(self):
         self._shouldDestroy = True

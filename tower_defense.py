@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 
 from board import Board
-from unit_agent import RandomUnitAgent
+from unit_agent import *
 from tower import Tower
 from tower_agent import TowerAgent
 from generator import Generator
@@ -13,7 +13,6 @@ class App:
         self._running = True
         self._image_surf = None
         self._board = None
-        self._agents = [TowerAgent(10), RandomUnitAgent(10, 10, 1000)]
         self._generator = Generator()
         self._gamesPlayed = 0
         self._renderFullGame = False
@@ -28,8 +27,6 @@ class App:
         self._board = Board(0, 64)
         self._steps = 0
 
-        # for agent in self._agents:
-        #     agent.init(self._board)
         self._generator.init()
 
 
@@ -71,9 +68,7 @@ class App:
                 self.on_render()
 
     def on_loop(self):
-        # for agent in self._agents:
-        #     agent.step(self._board)
-        self._generator.step(self._steps, self._board)
+        self._generator.step(self._board, self._steps)
         self._board.step()
 
     def on_render(self):
@@ -100,27 +95,15 @@ class App:
                     rect.fill((0,180,0))
                     self._screen.blit(rect, (nodeX, nodeY))
 
+        # Draw board
         self._board.draw(self._screen)
 
-        # Draw unit paths
-        # for unit in self._board._units:
-        #     if unit._drawPath or self._debugPath:
-        #         for node in unit._path:
-        #             nodeX = self._board._offset_x + node[0] * self._board._cell_size
-        #             nodeY = self._board._offset_y + node[1] * self._board._cell_size
-        #             rect = pygame.Surface((self._board._cell_size, self._board._cell_size))
-        #             rect.set_alpha(128)
-        #             rect.fill((150,0,0))
-        #             self._screen.blit(rect, (nodeX, nodeY))
-
-        # xCoord = 10
-        # for agent in self._agents:
-        #     agent.render(self._screen, xCoord, 10)
-        #     xCoord += (self._board._width * self._board._cell_size) / len(self._agents)
+        # Draw step count
         myfont = pygame.font.SysFont("monospace", 15)
         label = myfont.render("Step: {0}".format(self._steps), 1, (255,255,0))
         self._screen.blit(label, (10, 10))
 
+        # Draw score
         label = myfont.render("Score: {0}".format(self._board.getScore()), 1, (255,255,0))
         self._screen.blit(label, ((self._board._width * self._board._cell_size) / 2, 10))
 
@@ -133,23 +116,33 @@ class App:
         if self.on_init() == False:
             self._running = False
 
+        print("Begin Random Training")
+
         while (self._running):
-            start = pygame.time.get_ticks()
             for event in pygame.event.get():
                 self.on_event(event)
             if not self._paused:
-                if self._steps < 1000:
+                if len(self._board._units) == 0 and self._board._num_units == 10:
+                    self.on_game_over()
+                if self._steps < 2000:
                     self.on_loop()
                     if self._renderFullGame:
                         self.on_render()
-                elif self._steps >= 1000:
-                    self.on_render()
-                    self._gamesPlayed += 1
-                    self._generator.gameOver(self._board)
-                    self.on_init()
+                else:
+                    self.on_game_over()
                 self._steps += 1
+
         self.on_cleanup()
 
+    def on_game_over(self):
+        # Do a final render
+        self.on_render()
+        self._gamesPlayed += 1
+        # Call gameover methods
+        self._generator.gameOver(self._board)
+        print("Game {0} Finished (score = {1})".format(self._gamesPlayed, self._board.getScore()))
+        # Restart
+        self.on_init()
 
 if __name__ == "__main__":
     theApp = App()

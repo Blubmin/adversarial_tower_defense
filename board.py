@@ -44,7 +44,7 @@ class BoardState:
         otherTotal = 0.0
         for key in self.__dict__:
             thisTotal += pow(self.__dict__[key], 2)
-            otherTotal += pow(boardState.__dict__[key], 2)
+            otherTotal += pow(boardState[key], 2)
         thisTotal = math.sqrt(thisTotal)
         otherTotal = math.sqrt(otherTotal)
         # Normalize the state by dividing by the sum
@@ -54,7 +54,7 @@ class BoardState:
             else:
                 thisVector.append(0)
             if otherTotal > 0:
-                otherVector.append(boardState.__dict__[key] / otherTotal)
+                otherVector.append(boardState[key] / otherTotal)
             else:
                 otherVector.append(0)
         # Get the dist between the normalized states (max distance would be 1)
@@ -74,7 +74,10 @@ class Board:
         self._towers = [[None for x in range(self._height)] for x in range(self._width)]
         self._tower_list = []
         self._num_towers = 0
+        self._num_units = 0 # total that have been deployed this round
         self._last_tower = None
+        self._last_unit = None
+        self._last_unit_initial_location = None
         self._units = []
         self._bullets = []
         self._unitsThatReachedGoal = 0
@@ -112,7 +115,15 @@ class Board:
         return True
 
     def add_unit(self, unit):
+        if unit._x < 0 or unit._x > self._width-1:
+            return False
+        if unit._y != -1:
+            return False
         self._units.append(unit)
+        self._last_unit = unit
+        self._last_unit_initial_location = (unit._x, unit._y)
+        self._num_units += 1
+        return True
 
     def add_bullet(self, bullet):
         self._bullets.append(bullet)
@@ -176,7 +187,7 @@ class Board:
 
     def execute(self, action):
         if action.name == "PlaceUnitAction":
-            self.add_unit(Unit(action.x, -1))
+            self.add_unit(Unit(action.x, -1, 0))
         elif action.name == "PlaceTowerAction":
             self.add_tower(Tower(action.x, action.y))
 
